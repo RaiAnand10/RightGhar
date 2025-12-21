@@ -31,13 +31,6 @@ function App() {
 
       <main className="main-content">
         <div className="container">
-          <div className="properties-header">
-            <h2 className="section-title">Featured Properties</h2>
-            <p className="section-subtitle">
-              Discover your dream home from our curated collection of premium properties
-            </p>
-          </div>
-
           <div className="properties-grid">
             {properties.map((property) => (
               <PropertyCard
