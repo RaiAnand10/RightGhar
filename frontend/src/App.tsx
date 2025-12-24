@@ -3,17 +3,50 @@ import './App.css'
 import PropertyCard from './PropertyCard'
 import PropertyModal from './PropertyModal'
 import FilterSort, { SortOption, FilterState, BHKFilter, PriceRange } from './FilterSort'
+import { CompareButton } from './CompareButton'
+import { CompareView } from './CompareView'
 import { properties, Property } from './data'
 
 function App() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [compareList, setCompareList] = useState<Property[]>([])
+  const [isCompareOpen, setIsCompareOpen] = useState(false)
   const [sortBy, setSortBy] = useState<SortOption>('default')
   const [filters, setFilters] = useState<FilterState>({
     bhk: new Set<BHKFilter>(),
     possessionYear: new Set<string>(),
     priceRange: new Set<PriceRange>(),
   })
+
+  // Compare handlers
+  const handleToggleCompare = (property: Property, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const isInCompare = compareList.some(p => p.metadata.id === property.metadata.id)
+    
+    if (isInCompare) {
+      setCompareList(compareList.filter(p => p.metadata.id !== property.metadata.id))
+    } else {
+      if (compareList.length < 4) {
+        setCompareList([...compareList, property])
+      }
+    }
+  }
+
+  const handleRemoveFromCompare = (id: string) => {
+    setCompareList(compareList.filter(p => p.metadata.id !== id))
+  }
+
+  const handleAddToCompare = (property: Property) => {
+    if (compareList.length < 4) {
+      setCompareList([...compareList, property])
+    }
+  }
+
+  const isPropertyInCompare = (property: Property): boolean => {
+    return compareList.some(p => p.metadata.id === property.metadata.id)
+  }
+
 
   // Extract price from string (e.g., "₹2.25 CR" -> 2.25)
   const extractPrice = (priceStr: string | undefined): number | null => {
@@ -153,6 +186,8 @@ function App() {
             onSortChange={setSortBy}
             onFilterChange={setFilters}
             propertyCount={filteredAndSortedProperties.length}
+            compareCount={compareList.length}
+            onCompareClick={() => setIsCompareOpen(true)}
           />
 
           <div className="properties-grid">
@@ -161,6 +196,8 @@ function App() {
                 key={property.metadata.id}
                 property={property}
                 onClick={() => handlePropertyClick(property)}
+                isInCompare={isPropertyInCompare(property)}
+                onToggleCompare={(e) => handleToggleCompare(property, e)}
               />
             ))}
           </div>
@@ -183,6 +220,22 @@ function App() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
+
+      <CompareButton
+        count={compareList.length}
+        onClick={() => setIsCompareOpen(true)}
+      />
+
+      {isCompareOpen && (
+        <CompareView
+          properties={compareList}
+          allProperties={properties}
+          onClose={() => setIsCompareOpen(false)}
+          onRemove={handleRemoveFromCompare}
+          onAddMore={() => {}}
+          onAddProperty={handleAddToCompare}
+        />
+      )}
     </div>
   )
 }

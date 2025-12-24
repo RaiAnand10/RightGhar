@@ -17,6 +17,8 @@ interface FilterSortProps {
   onSortChange: (sort: SortOption) => void
   onFilterChange: (filters: FilterState) => void
   propertyCount: number
+  compareCount: number
+  onCompareClick: () => void
 }
 
 const priceRanges: { value: PriceRange; label: string }[] = [
@@ -33,7 +35,7 @@ const priceRanges: { value: PriceRange; label: string }[] = [
 const possessionYears = ['2026', '2027', '2028', '2029']
 const bhkOptions: BHKFilter[] = ['2', '3', '4']
 
-function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCount }: FilterSortProps) {
+function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCount, compareCount, onCompareClick }: FilterSortProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
@@ -187,6 +189,29 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
         </div>
 
         <div className="sort-and-clear">
+          <button className="compare-header-button" onClick={onCompareClick}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M9 12h6m-6 4h6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Compare Projects
+            {compareCount > 0 && (
+              <span className="compare-count-badge-header">{compareCount}</span>
+            )}
+          </button>
+
           <div className="sort-control">
             <label htmlFor="sort-select">Sort:</label>
             <select

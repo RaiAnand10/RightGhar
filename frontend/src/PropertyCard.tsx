@@ -4,13 +4,26 @@ import './PropertyCard.css';
 interface PropertyCardProps {
   property: Property;
   onClick: () => void;
+  isInCompare: boolean;
+  onToggleCompare: (e: React.MouseEvent) => void;
 }
 
-function PropertyCard({ property, onClick }: PropertyCardProps) {
+function PropertyCard({ property, onClick, isInCompare, onToggleCompare }: PropertyCardProps) {
   const { metadata } = property;
 
   return (
     <div className="property-card" onClick={onClick}>
+      <div className="compare-checkbox-wrapper" onClick={onToggleCompare}>
+        <input
+          type="checkbox"
+          className="compare-checkbox"
+          checked={isInCompare}
+          onChange={() => {}}
+          title={isInCompare ? 'Remove from comparison' : 'Add to comparison'}
+        />
+        <span className="compare-checkbox-label">Compare</span>
+      </div>
+      
       <div className="property-card-header">
         <h3 className="property-name">{metadata.project}</h3>
         <span className="property-builder">{metadata.builder}</span>
