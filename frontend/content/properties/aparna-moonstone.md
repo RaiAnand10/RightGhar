@@ -13,7 +13,9 @@ towers: 8
 floors: "G+44"
 unitSizes: "2000 - 3255 Sq. Ft."
 clubhouse: "Over 1 Lakh Sq. Ft."
-openSpace: "85%"
+openSpace: "80%"
+lat: 17.4485
+lng: 78.3297
 ---
 
 # Aparna Moonstone

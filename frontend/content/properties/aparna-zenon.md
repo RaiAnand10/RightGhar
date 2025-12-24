@@ -13,7 +13,9 @@ towers: 14
 floors: 33
 unitSizes: "1326 - 2257 Sq. Ft."
 clubhouse: "86,000+ Sq. Ft."
-openSpace: "80%+"
+openSpace: "70%"
+lat: 17.3897
+lng: 78.3432
 ---
 
 # Aparna Zenon

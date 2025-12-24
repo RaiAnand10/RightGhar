@@ -13,7 +13,9 @@ towers: 8
 floors: "G+46"
 unitSizes: "1325 - 2180 Sq. Ft."
 clubhouse: "1 Lakh Sq. Ft. (4 Floors)"
-openSpace: "81%"
+openSpace: "Over 80%"
+lat: 17.4802
+lng: 78.2988
 ---
 
 # My Home Vipina

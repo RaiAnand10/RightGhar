@@ -13,7 +13,9 @@ towers: 1
 floors: "G+53"
 unitSizes: "3887 - 4624 Sq. Ft."
 clubhouse: "Exclusive amenities"
-openSpace: "Premium landscape"
+openSpace: "Premium landscaping"
+lat: 17.4167
+lng: 78.3547
 ---
 
 # My Home 99

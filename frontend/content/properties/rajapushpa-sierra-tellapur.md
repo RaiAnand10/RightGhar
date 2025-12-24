@@ -13,7 +13,9 @@ towers: 9
 floors: "G+49"
 unitSizes: "1223 - 2147 Sq. Ft."
 clubhouse: "1.5 Lakh Sq. Ft."
-openSpace: "76%"
+openSpace: "Over 75%"
+lat: 17.4835
+lng: 78.3015
 ---
 
 # Rajapushpa Sierra

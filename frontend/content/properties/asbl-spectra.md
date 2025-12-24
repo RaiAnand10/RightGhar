@@ -13,7 +13,9 @@ towers: 4
 floors: "G+39"
 unitSizes: "1980 - 2220 Sq. Ft."
 clubhouse: "75,000 Sq. Ft."
-openSpace: "76%"
+openSpace: "80%"
+lat: 17.4178
+lng: 78.3442
 ---
 
 # ASBL Spectra

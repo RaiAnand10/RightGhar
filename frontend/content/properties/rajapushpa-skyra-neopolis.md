@@ -13,7 +13,9 @@ towers: 3
 floors: 56
 unitSizes: "2605 - 3740 Sq. Ft."
 clubhouse: "1.15 Lakh Sq. Ft."
-openSpace: "Premium landscape"
+openSpace: "80%"
+lat: 17.4195
+lng: 78.3580
 ---
 
 # Rajapushpa Skyra Neopolis

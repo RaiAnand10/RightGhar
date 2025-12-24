@@ -14,6 +14,8 @@ floors: "G+39"
 unitSizes: "1370 - 2180 Sq. Ft."
 clubhouse: "105,000 Sq. Ft. (2 Clubhouses)"
 openSpace: "Over 80%"
+lat: 17.4525
+lng: 78.3350
 ---
 
 # My Home Akrida

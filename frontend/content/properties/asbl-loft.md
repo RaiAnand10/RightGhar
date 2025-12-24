@@ -13,7 +13,9 @@ towers: 2
 floors: "G+45"
 unitSizes: "1175 - 1695 Sq. Ft."
 clubhouse: "Premium amenities"
-openSpace: "Curated landscapes"
+openSpace: "Landscaped gardens"
+lat: 17.4239
+lng: 78.3373
 ---
 
 # ASBL Loft
