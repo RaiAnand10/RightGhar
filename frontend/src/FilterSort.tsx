@@ -6,6 +6,8 @@ export type BHKFilter = '2' | '3' | '4'
 export type PriceRange = '0.5-1' | '1-1.5' | '1.5-2' | '2-2.5' | '2.5-4' | '4-6' | '6-10' | '10+'
 
 export interface FilterState {
+  city: Set<string>
+  locality: Set<string>
   bhk: Set<BHKFilter>
   possessionYear: Set<string>
   priceRange: Set<PriceRange>
@@ -34,6 +36,11 @@ const priceRanges: { value: PriceRange; label: string }[] = [
 
 const possessionYears = ['2026', '2027', '2028', '2029']
 const bhkOptions: BHKFilter[] = ['2', '3', '4']
+const cityOptions = ['Hyderabad', 'Bangalore']
+const localityOptions: { [key: string]: string[] } = {
+  'Hyderabad': ['Puppalaguda', 'Gopanpally', 'Tellapur', 'Kokapet', 'Gachibowli', 'Financial District'],
+  'Bangalore': []
+}
 
 function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCount, compareCount, onCompareClick }: FilterSortProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
@@ -64,6 +71,27 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     onFilterChange({ ...filters, bhk: newBHK })
   }
 
+  const toggleCity = (city: string) => {
+    const newCities = new Set(filters.city)
+    if (newCities.has(city)) {
+      newCities.delete(city)
+    } else {
+      newCities.add(city)
+    }
+    // Clear locality when city changes
+    onFilterChange({ ...filters, city: newCities, locality: new Set() })
+  }
+
+  const toggleLocality = (locality: string) => {
+    const newLocalities = new Set(filters.locality)
+    if (newLocalities.has(locality)) {
+      newLocalities.delete(locality)
+    } else {
+      newLocalities.add(locality)
+    }
+    onFilterChange({ ...filters, locality: newLocalities })
+  }
+
   const togglePossessionYear = (year: string) => {
     const newYears = new Set(filters.possessionYear)
     if (newYears.has(year)) {
@@ -86,6 +114,8 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
 
   const clearAllFilters = () => {
     onFilterChange({
+      city: new Set(),
+      locality: new Set(),
       bhk: new Set(),
       possessionYear: new Set(),
       priceRange: new Set(),
@@ -93,7 +123,12 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     onSortChange('default')
   }
 
-  const activeFiltersCount = filters.bhk.size + filters.possessionYear.size + filters.priceRange.size
+  const activeFiltersCount = filters.city.size + filters.locality.size + filters.bhk.size + filters.possessionYear.size + filters.priceRange.size
+
+  // Get available localities based on selected cities
+  const availableLocalities = filters.city.size > 0
+    ? Array.from(filters.city).flatMap(city => localityOptions[city] || [])
+    : []
 
   const toggleDropdown = (dropdown: string) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown)
@@ -103,6 +138,64 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     <div className="filter-sort-container">
       <div className="filter-sort-controls">
         <div className="filter-buttons-group">
+          {/* City Filter */}
+          <div className="filter-dropdown" ref={el => dropdownRefs.current['city'] = el}>
+            <button
+              className={`filter-button-inline ${filters.city.size > 0 ? 'has-selection' : ''}`}
+              onClick={() => toggleDropdown('city')}
+            >
+              City
+              {filters.city.size > 0 && (
+                <span className="filter-badge">{filters.city.size}</span>
+              )}
+              <span className="dropdown-arrow">{openDropdown === 'city' ? '▲' : '▼'}</span>
+            </button>
+            {openDropdown === 'city' && (
+              <div className="dropdown-menu">
+                {cityOptions.map(city => (
+                  <label key={city} className="dropdown-option">
+                    <input
+                      type="checkbox"
+                      checked={filters.city.has(city)}
+                      onChange={() => toggleCity(city)}
+                    />
+                    <span>{city}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Locality Filter - Only show if at least one city is selected */}
+          {filters.city.size > 0 && (
+            <div className="filter-dropdown" ref={el => dropdownRefs.current['locality'] = el}>
+              <button
+                className={`filter-button-inline ${filters.locality.size > 0 ? 'has-selection' : ''}`}
+                onClick={() => toggleDropdown('locality')}
+              >
+                Locality
+                {filters.locality.size > 0 && (
+                  <span className="filter-badge">{filters.locality.size}</span>
+                )}
+                <span className="dropdown-arrow">{openDropdown === 'locality' ? '▲' : '▼'}</span>
+              </button>
+              {openDropdown === 'locality' && (
+                <div className="dropdown-menu">
+                  {availableLocalities.map(locality => (
+                    <label key={locality} className="dropdown-option">
+                      <input
+                        type="checkbox"
+                        checked={filters.locality.has(locality)}
+                        onChange={() => toggleLocality(locality)}
+                      />
+                      <span>{locality}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Configuration Filter */}
           <div className="filter-dropdown" ref={el => dropdownRefs.current['config'] = el}>
             <button

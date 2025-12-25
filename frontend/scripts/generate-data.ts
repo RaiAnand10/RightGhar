@@ -106,6 +106,9 @@ export interface PropertyMetadata {
   unitSizes: string;
   clubhouse: string;
   openSpace: string;
+  lat: string;
+  lng: string;
+  url?: string;
 }
 
 export interface Property {

@@ -18,6 +18,8 @@ function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [sortBy, setSortBy] = useState<SortOption>('default')
   const [filters, setFilters] = useState<FilterState>({
+    city: new Set<string>(),
+    locality: new Set<string>(),
     bhk: new Set<BHKFilter>(),
     possessionYear: new Set<string>(),
     priceRange: new Set<PriceRange>(),
@@ -86,6 +88,22 @@ function App() {
     return Array.from(bhkFilters).some(bhk => config.includes(`${bhk} bhk`))
   }
 
+  // Check if property matches city filter
+  const matchesCity = (property: Property, cityFilters: Set<string>): boolean => {
+    if (cityFilters.size === 0) return true
+    
+    const location = property.metadata.location || ''
+    return Array.from(cityFilters).some(city => location.includes(city))
+  }
+
+  // Check if property matches locality filter
+  const matchesLocality = (property: Property, localityFilters: Set<string>): boolean => {
+    if (localityFilters.size === 0) return true
+    
+    const location = property.metadata.location || ''
+    return Array.from(localityFilters).some(locality => location.includes(locality))
+  }
+
   // Check if property matches possession year filter
   const matchesPossessionYear = (property: Property, yearFilters: Set<string>): boolean => {
     if (yearFilters.size === 0) return true
@@ -122,6 +140,8 @@ function App() {
   const filteredAndSortedProperties = useMemo(() => {
     // Apply filters
     let filtered = properties.filter(property => 
+      matchesCity(property, filters.city) &&
+      matchesLocality(property, filters.locality) &&
       matchesBHK(property, filters.bhk) &&
       matchesPossessionYear(property, filters.possessionYear) &&
       matchesPriceRange(property, filters.priceRange)
