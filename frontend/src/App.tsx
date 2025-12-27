@@ -86,10 +86,23 @@ function App() {
     if (bhkFilters.size === 0) return true
     
     const config = property.metadata.configuration?.toLowerCase() || ''
-    // Match the number followed by optional space and "bhk" (e.g., "3 bhk", "3bhk", "3 & 4 BHK")
+    // Match formats like "3 BHK", "3BHK", "3 & 4 BHK", "2, 3 & 4 BHK"
+    // Strategy: Check if the number exists before "bhk" in the string
     return Array.from(bhkFilters).some(bhk => {
-      const regex = new RegExp(`\\b${bhk}\\s*bhk\\b`, 'i')
-      return regex.test(config)
+      // First try exact match like "3 bhk" or "3bhk"
+      const exactRegex = new RegExp(`\\b${bhk}\\s*bhk\\b`, 'i')
+      if (exactRegex.test(config)) return true
+      
+      // Then check if number appears before "bhk" (handles "3 & 4 BHK" format)
+      const bhkIndex = config.indexOf('bhk')
+      if (bhkIndex > 0) {
+        const beforeBhk = config.substring(0, bhkIndex)
+        // Check if the number exists as a standalone number before "bhk"
+        const numberRegex = new RegExp(`\\b${bhk}\\b`)
+        return numberRegex.test(beforeBhk)
+      }
+      
+      return false
     })
   }
 
