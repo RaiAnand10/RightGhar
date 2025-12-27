@@ -89,15 +89,28 @@ class PropertyScraper:
         )
         self.deployment = azure_openai_deployment
     
-    def scrape_with_firecrawl(self, url: str) -> Optional[Dict[str, Any]]:
+    def scrape_with_firecrawl(self, url: str, actions: Optional[List[Dict[str, Any]]] = None) -> Optional[Dict[str, Any]]:
         """
         Scrape a URL using Firecrawl API.
         
+        Args:
+            url: The URL to scrape
+            actions: Optional list of actions to perform before scraping (e.g., clicking "Load More" buttons)
+                     Example: [{"type": "click", "selector": "button.load-more"}, {"type": "wait", "milliseconds": 2000}]
+
         Returns dict with 'markdown', 'html', and 'url' keys.
         """
         try:
             print(f"   Scraping with Firecrawl: {url}")
-            result = self.firecrawl.scrape(url, formats=["markdown", "html"])
+            if actions:
+                print(f"   Executing {len(actions)} action(s) before scraping...")
+
+            # Build scrape parameters
+            params = {"formats": ["markdown", "html"]}
+            if actions:
+                params["actions"] = actions
+
+            result = self.firecrawl.scrape(url, **params)
             
             return {
                 'markdown': result.markdown if hasattr(result, 'markdown') else '',
@@ -215,22 +228,37 @@ class PropertyScraper:
         return markdown
     
     
-    def extract_listing_urls_deterministic(self, html_content: str, base_url: str) -> List[str]:
+    def extract_listing_urls_deterministic(self, html_content: str, base_url: str, builder: str = None, url_patterns: list = None) -> List[str]:
         """
         Use BeautifulSoup to deterministically extract property URLs from listing page HTML.
         
-        Looks for <a> tags with hrefs matching common property page patterns:
-        - /ads/, /project/, /property/, /apartment/, /villa/
-        - Must have at least 3 path segments (e.g., /ads/hyderabad/project-name)
-        - Filters out navigation, footer, and external links
+        Uses builder-specific regex patterns from BUILDER_URL_PATTERNS config if available,
+        otherwise falls back to default pattern matching.
         
-        Returns list of absolute URLs.
+        Args:
+            html_content: Raw HTML from listing page
+            base_url: Base URL for resolving relative links
+            builder: Builder name to lookup custom patterns (optional)
+            url_patterns: List of regex patterns to match URLs (optional)
+
+        Returns:
+            List of absolute URLs to project pages
         """
         if not html_content:
             return []
         
         soup = BeautifulSoup(html_content, 'html.parser')
         urls = set()
+        base_parsed = urlparse(base_url)
+        base_domain = base_parsed.netloc
+
+        # Default patterns if none specified
+        if url_patterns is None:
+            default_patterns = [r'/ads/', r'/project/', r'/property/', r'/apartment/', r'/villa/', r'/residential/']
+        else:
+            default_patterns = url_patterns
+
+        import re
         
         for link in soup.find_all('a', href=True):
             href = link['href']
@@ -241,20 +269,16 @@ class PropertyScraper:
             
             # Make URL absolute
             full_url = urljoin(base_url, href)
-            parsed = urlparse(full_url)
             
-            # Only same domain
-            base_domain = urlparse(base_url).netloc
-            if base_domain not in parsed.netloc:
-                continue
+            # Check if URL matches any of the patterns
+            matched = False
+            for pattern in default_patterns:
+                if re.search(pattern, full_url, re.IGNORECASE):
+                    matched = True
+                    break
             
-            # Look for property detail page patterns
-            path = parsed.path.lower()
-            if any(pattern in path for pattern in ['/ads/', '/project/', '/property/', '/apartment/', '/villa/']):
-                path_parts = [p for p in path.split('/') if p]
-                # Property pages have more segments than listing pages
-                if len(path_parts) >= 3:
-                    urls.add(full_url)
+            if matched:
+                urls.add(full_url)
         
         return list(urls)
     
@@ -426,19 +450,21 @@ Return your response as JSON in this EXACT format:
             print(f"      ✗ Error creating file: {e}")
             return False
     
-    def scrape_all(self, listing_urls: Dict[str, str]) -> int:
+    def scrape_all(self, listing_urls: Dict[str, str], listing_actions: Optional[Dict[str, List[Dict[str, Any]]]] = None, url_patterns: Optional[Dict[str, List[str]]] = None) -> int:
         """
         Scrape all properties from the provided listing URLs.
         
         For each builder:
-        1. Scrape listing page with Firecrawl
-        2. Extract property URLs with BeautifulSoup
+        1. Scrape listing page with Firecrawl (with optional actions for dynamic content)
+        2. Extract property URLs with BeautifulSoup (using custom regex patterns if provided)
         3. Scrape each property page with Firecrawl
         4. Extract metadata and generate content with Azure OpenAI
         5. Save as markdown file with YAML frontmatter
         
         Args:
             listing_urls: Dict mapping builder names to listing page URLs
+            listing_actions: Optional dict mapping builder names to lists of actions to perform before scraping
+            url_patterns: Optional dict mapping builder names to lists of regex patterns for URL matching
             
         Returns:
             Total number of properties successfully scraped
@@ -451,36 +477,61 @@ Return your response as JSON in this EXACT format:
             print(f"Listing URL: {listing_url}")
             print(f"{'='*60}\n")
             
-            # Step 1: Scrape the listing page with Firecrawl
-            print("Step 1: Scraping listing page...")
-            listing_result = self.scrape_with_firecrawl(listing_url)
-            
-            if not listing_result:
-                print(f"✗ Failed to scrape listing page for {builder}")
-                continue
-            
-            markdown_content = listing_result.get('markdown', '')
-            html_content = listing_result.get('html', '')
-            
-            if not markdown_content:
-                print(f"✗ No markdown content retrieved for {builder}")
-                continue
-            
-            # Step 2: Extract property URLs using deterministic parsing (or cache)
-            print("\nStep 2: Extracting property URLs...")
+            # Step 1: Check cache for property URLs first
+            print("Step 1: Checking cache for property URLs...")
             
             # Check cache first
             property_urls = self.get_cached_builder_urls(builder)
+
+            # If cache has zero URLs, treat it as cache miss and re-scrape
+            if property_urls is not None and len(property_urls) == 0:
+                print(f"   ⚠ Cached URLs is empty, will scrape listing page...")
+                property_urls = None
+
             if property_urls:
                 print(f"   ✓ Using cached URLs ({len(property_urls)} properties)")
                 for url in property_urls:
                     print(f"      - {url}")
             else:
-                print(f"   → Cache miss, extracting from HTML...")
-                property_urls = self.extract_listing_urls_deterministic(html_content, listing_url)
+                # Step 2: Scrape the listing page with Firecrawl (only if cache miss)
+                print(f"\n   → Cache miss, scraping listing page...")
+
+                # Get actions for this builder if any
+                actions = listing_actions.get(builder) if listing_actions else None
+                if actions:
+                    print(f"   Using {len(actions)} action(s) to handle dynamic content")
+
+                listing_result = self.scrape_with_firecrawl(listing_url, actions=actions)
+                
+                if not listing_result:
+                    print(f"✗ Failed to scrape listing page for {builder}")
+                    continue
+
+                markdown_content = listing_result.get('markdown', '')
+                html_content = listing_result.get('html', '')
+
+                if not markdown_content:
+                    print(f"✗ No markdown content retrieved for {builder}")
+                    continue
+
+                print(f"   → Extracting property URLs from HTML...")
+
+                # Get URL patterns for this builder
+                builder_patterns = url_patterns.get(builder) if url_patterns else None
+                if builder_patterns:
+                    print(f"   ℹ Using custom URL patterns for {builder}")
+
+                property_urls = self.extract_listing_urls_deterministic(
+                    html_content,
+                    listing_url,
+                    builder=builder,
+                    url_patterns=builder_patterns
+                )
                 
                 if not property_urls:
                     print(f"   ✗ No property URLs found for {builder}")
+                    # Save empty list to cache so we know we tried
+                    self.save_builder_urls_cache(builder, [])
                     continue
                 
                 print(f"   ✓ Found {len(property_urls)} property URLs")
@@ -490,7 +541,7 @@ Return your response as JSON in this EXACT format:
                 # Save to cache for next time
                 self.save_builder_urls_cache(builder, property_urls)
                 print(f"   ✓ Cached URLs for future runs")
-            
+
             # Step 3: Scrape each property and extract data
             print(f"\nStep 3: Scraping individual properties...")
             
@@ -541,7 +592,7 @@ def main():
     from dotenv import load_dotenv
     
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from config import LISTING_URLS, OUTPUT_DIR
+    from config import LISTING_URLS, LISTING_ACTIONS, BUILDER_URL_PATTERNS, OUTPUT_DIR
     
     load_dotenv()
     
@@ -571,7 +622,11 @@ def main():
     print("Property Scraper - Starting")
     print("="*60)
     
-    total = scraper.scrape_all(LISTING_URLS)
+    total = scraper.scrape_all(
+        LISTING_URLS,
+        listing_actions=LISTING_ACTIONS,
+        url_patterns=BUILDER_URL_PATTERNS
+    )
     
     print("\n" + "="*60)
     print(f"Scraping Complete: {total} properties saved to {OUTPUT_DIR}")

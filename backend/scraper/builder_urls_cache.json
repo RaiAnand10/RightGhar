@@ -1,10 +1,155 @@
 {
   "Prestige Constructions": [
     "https://www.prestigeconstructions.com/ads/hyderabad/prestige-clairemont",
-    "https://www.prestigeconstructions.com/ads/hyderabad/prestige-vaishnaoi-rainbow-waters",
-    "https://www.prestigeconstructions.com/ads/hyderabad/the-prestige-city-rajendra-nagar/apartment",
     "https://www.prestigeconstructions.com/ads/hyderabad/prestige-spring-heights",
-    "https://www.prestigeconstructions.com/ads/hyderabad/the-prestige-city-rajendra-nagar/bellagio",
-    "https://www.prestigeconstructions.com/ads/hyderabad/the-prestige-city-rajendra-nagar"
+    "https://www.prestigeconstructions.com/ads/hyderabad/the-prestige-city-rajendra-nagar/apartment",
+    "https://www.prestigeconstructions.com/ads/hyderabad/prestige-vaishnaoi-rainbow-waters",
+    "https://www.prestigeconstructions.com/ads/hyderabad/the-prestige-city-rajendra-nagar",
+    "https://www.prestigeconstructions.com/ads/hyderabad/the-prestige-city-rajendra-nagar/bellagio"
+  ],
+  "Aparna Constructions": [
+    "https://www.aparnaconstructions.com/project/apartments/aparna-sunstone",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-cyberstar",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-one",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-sarovar-towers",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-greenscapes",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-serenity",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-newlands",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-cyberheights",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-cyberon",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-sarovar-zicon",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-deccan-town",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-moonstone",
+    "https://www.aparnaconstructions.com/project/apartments/aparna-zenon"
+  ],
+  "Rajapushpa Properties": [
+    "https://www.rajapushpa.in/projects/residential/rajapushpa-aurelia.php",
+    "https://www.rajapushpa.in/projects/residential/rajapushpa-casa-luxura.php",
+    "https://www.rajapushpa.in/projects/residential/rajapushpa-imperia.php",
+    "https://www.rajapushpa.in/projects/residential/rajapushpa-serene-dale.php",
+    "https://www.rajapushpa.in/projects/residential/rajapushpainfina.php",
+    "https://www.rajapushpa.in/projects/residential/rajapushpapristinia.php",
+    "https://www.rajapushpa.in/projects/residential/rajapushpaprovincia.php",
+    "https://www.rajapushpa.in/projects/residential/rajapushpaskyra.php",
+    "https://www.rajapushpa.in/projects/residential/sierra-tellapur.php"
+  ],
+  "My Home Group": [
+    "https://www.myhomeconstructions.com/my-home-99/",
+    "https://www.myhomeconstructions.com/my-home-akrida/",
+    "https://www.myhomeconstructions.com/my-home-apas/",
+    "https://www.myhomeconstructions.com/my-home-avali/",
+    "https://www.myhomeconstructions.com/my-home-grava/",
+    "https://www.myhomeconstructions.com/my-home-tridasa/",
+    "https://www.myhomeconstructions.com/my-home-vipina/",
+    "https://www.myhomeconstructions.com/my-home-raka/",
+    "https://www.myhomesayuk.co.in/",
+    "https://www.myhomenishada.co.in/"
+  ],
+  "Raghava": [
+    "https://sagebyraghava.world/",
+    "https://wavebyraghava.world/",
+    "https://irisbyraghava.world/",
+    "https://cinqbyraghava.world/"
+  ],
+  "Jayabheri": [
+    "https://www.jayabherigroup.com/thenirvana/",
+    "https://www.jayabherigroup.com/thesahasra/",
+    "https://www.trendsetjayabheri.com/elevate/",
+    "https://www.jayabherigroup.com/thepinnacle/",
+    "https://www.jayabherigroup.com/thecapital/index.html"
+  ],
+  "DSR builders": [
+    "https://dsrbuilders.in/altitudes.php",
+    "https://dsrbuilders.in/fortune-sonthalia-skyvillas.php",
+    "https://dsrbuilders.in/gvk-sky-city.php",
+    "https://dsrbuilders.in/skymarqbydsr.php",
+    "https://dsrbuilders.in/som-boulevard.php",
+    "https://dsrbuilders.in/twinsbydsr.php",
+    "https://dsrbuilders.in/wbydsr.php"
+  ],
+  "Myscape": [
+    "https://myscape.in/project/edition/",
+    "https://myscape.in/project/isleofsky/",
+    "https://myscape.in/project/loft/",
+    "https://myscape.in/project/mea/",
+    "https://myscape.in/project/otomo/",
+    "https://myscape.in/project/sanctuary/",
+    "https://myscape.in/songsofthesun/"
+  ],
+  "Candeur": [
+    "https://www.candeur.in/projects/candeur-crescent",
+    "https://www.candeur.in/projects/candeur-twins",
+    "https://www.candeur.in/projects/candeur-lakescape",
+    "https://www.candeur.in/projects/candeur-skyline",
+    "https://www.candeur.in/projects/candeur-40"
+  ],
+  "Ramky Estates": [
+    "https://www.ramkyestates.com/projects/ramky-one-genext/",
+    "https://www.ramkyestates.com/projects/the-reserve-by-ramky/",
+    "https://www.ramkyestates.com/projects/ramky-bliss/",
+    "https://www.ramkyestates.com/projects/the-eminent-by-ramky/",
+    "https://www.ramkyestates.com/projects/ramky-one-odyssey/",
+    "https://www.ramkyestates.com/projects/spectrum-by-ramky/",
+    "https://www.ramkyestates.com/projects/ramky-nextown/",
+    "https://www.ramkyestates.com/projects/ramky-one-orbit/",
+    "https://www.ramkyestates.com/projects/ramky-one-astra/"
+  ],
+  "Brigade": [
+    "https://www.brigadegroup.com/residential/projects/hyderabad/brigade-gateway",
+    "https://www.brigadegroup.com/residential/projects/hyderabad/brigade-citadel"
+  ],
+  "Honer Homes": [
+    "https://www.honerhomes.com/projects/honer-richmont",
+    "https://www.honerhomes.com/projects/honer-signatis",
+    "https://www.honerhomes.com/projects/honer-vivantis",
+    "https://www.honerhomes.com/projects/honer-aquantis"
+  ],
+  "GHR infra": [
+    "https://ghrinfra.in/titania/",
+    "https://ghrinfra.in/callisto/"
+  ],
+  "Lansum": [
+    "https://lansumproperties.com/evana-chevella/",
+    "https://theencanto.com/",
+    "https://elenaresidences.com/",
+    "https://lansumproperties.com/projects/lansum-el-dorado/"
+  ],
+  "Sumadhura": [
+    "https://sumadhurarealty.com/the-olympus/",
+    "https://sumadhurarealty.com/gardens-by-the-brook/",
+    "https://sumadhurarealty.com/sumadhura-horizon/"
+  ],
+  "Vasavi group": [
+    "https://thevasavigroup.com/projects/apartments-in-nanakramguda-olympus/",
+    "https://thevasavigroup.com/projects/vasavi-avasa/",
+    "https://thevasavigroup.com/projects/vasavi-atlantis-high-rise-apartments/",
+    "https://thevasavigroup.com/projects/vasavi-urban-2-bhk-flats-for-sale/",
+    "https://thevasavigroup.com/projects/ananda-nilayam-largest-gated-community/",
+    "https://thevasavigroup.com/projects/2-bhk-apartments-for-sale-in-hyderabad/",
+    "https://thevasavigroup.com/projects/vasavi-skyla-luxury-apartments/",
+    "https://thevasavigroup.com/projects/vasavi-sarovar/"
+  ],
+  "Vertex homes": [
+    "https://vertexhomes.com/vertex-projects/vertex-siris-signa",
+    "https://vertexhomes.com/vertex-projects/vertex-pristine",
+    "https://vertexhomes.com/vertex-projects/vertex-viraat",
+    "https://vertexhomes.com/vertex-projects/vertex-33-west",
+    "https://vertexhomes.com/vertex-projects/vertex-luxuria"
+  ],
+  "Hallmark builders": [
+    "https://hallmarkbuilders.in/5A.php",
+    "https://hallmarkbuilders.in/treasor.php",
+    "https://hallmarkbuilders.in/nature-nest.php",
+    "https://hallmarkbuilders.in/floresta.php",
+    "https://hallmarkbuilders.in/oakshir.php",
+    "https://hallmarkbuilders.in/sunnyside.php",
+    "https://hallmarkbuilders.in/skyrena.php",
+    "https://hallmarkbuilders.in/pinnacle.php"
+  ],
+  "ASBL": [
+    "https://asbl.in/broadway/",
+    "https://asbl.in/landmark/",
+    "https://asbl.in/loft/",
+    "https://asbl.in/spectra/"
   ]
 }
