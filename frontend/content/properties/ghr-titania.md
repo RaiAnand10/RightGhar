@@ -5,8 +5,8 @@ clubhouse: 23,700 Sq. Ft.
 configuration: 2, 2.5 & 3 BHK
 floors: 10
 id: ghr-titania
-lat: 17.4195
-lng: 78.358
+lat: 17.4588
+lng: 78.3731
 location: Kondapur, Hyderabad
 openSpace: TBD
 possession: Under Construction

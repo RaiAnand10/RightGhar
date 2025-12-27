@@ -5,8 +5,8 @@ clubhouse: 52,000 Sq. Ft.
 configuration: 3 & 3.5 BHK
 floors: 20
 id: asbl-landmark
-lat: 17.4195
-lng: 78.358
+lat: 17.4745
+lng: 78.4257
 location: Y Junction, Kukatpally
 openSpace: TBD
 possession: March 2028

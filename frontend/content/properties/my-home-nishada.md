@@ -5,8 +5,8 @@ clubhouse: 1 Lakh Sq. Ft.
 configuration: 3 & 4 BHK
 floors: 44
 id: my-home-nishada
-lat: 17.4195
-lng: 78.358
+lat: 17.4043
+lng: 78.3305
 location: Kokapet, Hyderabad
 openSpace: 80%
 possession: Dec 2025

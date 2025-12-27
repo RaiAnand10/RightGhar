@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 4 BHK + Maid room
 floors: 61
 id: cinq-by-raghava
-lat: 17.4195
-lng: 78.358
+lat: 17.4043
+lng: 78.3305
 location: Financial District, Hyderabad
 openSpace: TBD
 possession: TBD

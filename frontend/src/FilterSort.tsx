@@ -8,6 +8,7 @@ export type PriceRange = '0.5-1' | '1-1.5' | '1.5-2' | '2-2.5' | '2.5-4' | '4-6'
 export interface FilterState {
   city: Set<string>
   locality: Set<string>
+  builder: Set<string>
   bhk: Set<BHKFilter>
   possessionYear: Set<string>
   priceRange: Set<PriceRange>
@@ -38,12 +39,58 @@ const possessionYears = ['2026', '2027', '2028', '2029']
 const bhkOptions: BHKFilter[] = ['2', '3', '4']
 const cityOptions = ['Hyderabad', 'Bangalore']
 const localityOptions: { [key: string]: string[] } = {
-  'Hyderabad': ['Puppalaguda', 'Gopanpally', 'Tellapur', 'Kokapet', 'Gachibowli', 'Financial District'],
+  'Hyderabad': [
+    'Kokapet',
+    'Tellapur', 
+    'Kondapur',
+    'Financial District',
+    'Osman Nagar',
+    'Neopolis',
+    'Narsingi',
+    'Nallagandla',
+    'Gopanpally',
+    'Rajendra Nagar',
+    'Puppalaguda',
+    'Kompally',
+    'Uppal',
+    'Miyapur',
+    'Manchirevula',
+    'Kukatpally',
+    'Kollur',
+    'Gachibowli',
+    'Bachupally',
+    'Shamshabad'
+  ],
   'Bangalore': []
 }
 
+const builderOptions = [
+  'Aparna Constructions',
+  'Ramky Estates',
+  'Rajapushpa Properties',
+  'Vasavi group',
+  'Hallmark builders',
+  'Myscape',
+  'My Home Group',
+  'My Home Constructions',
+  'DSR builders',
+  'Vertex homes',
+  'Prestige Constructions',
+  'Jayabheri',
+  'Candeur',
+  'Raghava',
+  'Lansum',
+  'Honer Homes',
+  'Sumadhura',
+  'GHR infra',
+  'Brigade',
+  'ASBL'
+]
+
 function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCount, compareCount, onCompareClick }: FilterSortProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [localitySearch, setLocalitySearch] = useState('')
+  const [builderSearch, setBuilderSearch] = useState('')
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
   // Close dropdown when clicking outside
@@ -92,6 +139,16 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     onFilterChange({ ...filters, locality: newLocalities })
   }
 
+  const toggleBuilder = (builder: string) => {
+    const newBuilders = new Set(filters.builder)
+    if (newBuilders.has(builder)) {
+      newBuilders.delete(builder)
+    } else {
+      newBuilders.add(builder)
+    }
+    onFilterChange({ ...filters, builder: newBuilders })
+  }
+
   const togglePossessionYear = (year: string) => {
     const newYears = new Set(filters.possessionYear)
     if (newYears.has(year)) {
@@ -116,6 +173,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     onFilterChange({
       city: new Set(),
       locality: new Set(),
+      builder: new Set(),
       bhk: new Set(),
       possessionYear: new Set(),
       priceRange: new Set(),
@@ -123,15 +181,31 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     onSortChange('default')
   }
 
-  const activeFiltersCount = filters.city.size + filters.locality.size + filters.bhk.size + filters.possessionYear.size + filters.priceRange.size
+  const activeFiltersCount = filters.city.size + filters.locality.size + filters.builder.size + filters.bhk.size + filters.possessionYear.size + filters.priceRange.size
 
-  // Get available localities based on selected cities
+  // Get available localities based on selected cities, filtered by search
   const availableLocalities = filters.city.size > 0
     ? Array.from(filters.city).flatMap(city => localityOptions[city] || [])
     : []
+  
+  const filteredLocalities = availableLocalities.filter(locality =>
+    locality.toLowerCase().includes(localitySearch.toLowerCase())
+  )
+
+  // Filter builders by search
+  const filteredBuilders = builderOptions.filter(builder =>
+    builder.toLowerCase().includes(builderSearch.toLowerCase())
+  )
 
   const toggleDropdown = (dropdown: string) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown)
+    // Clear search when closing dropdown
+    if (openDropdown === 'locality') {
+      setLocalitySearch('')
+    }
+    if (openDropdown === 'builder') {
+      setBuilderSearch('')
+    }
   }
 
   return (
@@ -180,21 +254,79 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
                 <span className="dropdown-arrow">{openDropdown === 'locality' ? '▲' : '▼'}</span>
               </button>
               {openDropdown === 'locality' && (
-                <div className="dropdown-menu">
-                  {availableLocalities.map(locality => (
-                    <label key={locality} className="dropdown-option">
-                      <input
-                        type="checkbox"
-                        checked={filters.locality.has(locality)}
-                        onChange={() => toggleLocality(locality)}
-                      />
-                      <span>{locality}</span>
-                    </label>
-                  ))}
+                <div className="dropdown-menu dropdown-menu-searchable">
+                  <input
+                    type="text"
+                    className="dropdown-search-input"
+                    placeholder="Type to search..."
+                    value={localitySearch}
+                    onChange={(e) => setLocalitySearch(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    autoFocus
+                  />
+                  <div className="dropdown-options-list">
+                    {filteredLocalities.length > 0 ? (
+                      filteredLocalities.map(locality => (
+                        <label key={locality} className="dropdown-option">
+                          <input
+                            type="checkbox"
+                            checked={filters.locality.has(locality)}
+                            onChange={() => toggleLocality(locality)}
+                          />
+                          <span>{locality}</span>
+                        </label>
+                      ))
+                    ) : (
+                      <div className="dropdown-no-results">No localities found</div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
           )}
+
+          {/* Builder Filter */}
+          <div className="filter-dropdown" ref={el => dropdownRefs.current['builder'] = el}>
+            <button
+              className={`filter-button-inline ${filters.builder.size > 0 ? 'has-selection' : ''}`}
+              onClick={() => toggleDropdown('builder')}
+            >
+              Builder
+              {filters.builder.size > 0 && (
+                <span className="filter-badge">{filters.builder.size}</span>
+              )}
+              <span className="dropdown-arrow">{openDropdown === 'builder' ? '▲' : '▼'}</span>
+            </button>
+            {openDropdown === 'builder' && (
+              <div className="dropdown-menu dropdown-menu-searchable">
+                <input
+                  type="text"
+                  className="dropdown-search-input"
+                  placeholder="Type to search..."
+                  value={builderSearch}
+                  onChange={(e) => setBuilderSearch(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  autoFocus
+                />
+                <div className="dropdown-options-list">
+                  {filteredBuilders.length > 0 ? (
+                    filteredBuilders.map(builder => (
+                      <label key={builder} className="dropdown-option">
+                        <input
+                          type="checkbox"
+                          checked={filters.builder.has(builder)}
+                          onChange={() => toggleBuilder(builder)}
+                        />
+                        <span>{builder}</span>
+                      </label>
+                    ))
+                  ) : (
+                    <div className="dropdown-no-results">No builders found</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Configuration Filter */}
           <div className="filter-dropdown" ref={el => dropdownRefs.current['config'] = el}>

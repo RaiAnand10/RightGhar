@@ -5,8 +5,8 @@ clubhouse: 131,385 Sq. Ft.
 configuration: 2, 3, 4 & 5 BHK, Sky Villas
 floors: 33
 id: vasavi-ananda-nilayam
-lat: 17.4195
-lng: 78.358
+lat: 17.3498
+lng: 78.5479
 location: L.B. Nagar, Hyderabad
 openSpace: 72%
 possession: December 2028

@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 2 & 3 BHK
 floors: 14
 id: ramky-one-genext-towers
-lat: 17.4195
-lng: 78.358
+lat: 17.4025
+lng: 78.5613
 location: Uppal, Hyderabad
 openSpace: TBD
 possession: Under Construction

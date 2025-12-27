@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 & 4 BHK
 floors: 35
 id: aparna-one
-lat: 17.4195
-lng: 78.358
+lat: 17.4058
+lng: 78.4007
 location: Shaikpet, Hyderabad
 openSpace: 80%
 possession: Ready to Move

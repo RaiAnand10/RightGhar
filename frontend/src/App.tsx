@@ -20,6 +20,7 @@ function App() {
   const [filters, setFilters] = useState<FilterState>({
     city: new Set<string>(),
     locality: new Set<string>(),
+    builder: new Set<string>(),
     bhk: new Set<BHKFilter>(),
     possessionYear: new Set<string>(),
     priceRange: new Set<PriceRange>(),
@@ -80,12 +81,16 @@ function App() {
     return match ? parseInt(match[0]) : null
   }
 
-  // Check if property matches BHK filter
+  // Check if property matches BHK filter using regex
   const matchesBHK = (property: Property, bhkFilters: Set<BHKFilter>): boolean => {
     if (bhkFilters.size === 0) return true
     
     const config = property.metadata.configuration?.toLowerCase() || ''
-    return Array.from(bhkFilters).some(bhk => config.includes(`${bhk} bhk`))
+    // Match the number followed by optional space and "bhk" (e.g., "3 bhk", "3bhk", "3 & 4 BHK")
+    return Array.from(bhkFilters).some(bhk => {
+      const regex = new RegExp(`\\b${bhk}\\s*bhk\\b`, 'i')
+      return regex.test(config)
+    })
   }
 
   // Check if property matches city filter
@@ -102,6 +107,16 @@ function App() {
     
     const location = property.metadata.location || ''
     return Array.from(localityFilters).some(locality => location.includes(locality))
+  }
+
+  // Check if property matches builder filter
+  const matchesBuilder = (property: Property, builderFilters: Set<string>): boolean => {
+    if (builderFilters.size === 0) return true
+    
+    const builder = property.metadata.builder || ''
+    return Array.from(builderFilters).some(b => 
+      builder.toLowerCase().includes(b.toLowerCase())
+    )
   }
 
   // Check if property matches possession year filter
@@ -142,6 +157,7 @@ function App() {
     let filtered = properties.filter(property => 
       matchesCity(property, filters.city) &&
       matchesLocality(property, filters.locality) &&
+      matchesBuilder(property, filters.builder) &&
       matchesBHK(property, filters.bhk) &&
       matchesPossessionYear(property, filters.possessionYear) &&
       matchesPriceRange(property, filters.priceRange)

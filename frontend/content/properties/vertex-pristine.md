@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 2 & 3 BHK
 floors: 0
 id: vertex-pristine
-lat: 17.4195
-lng: 78.358
+lat: 17.5014
+lng: 78.3842
 location: Hyder Nagar, Kukatpally
 openSpace: TBD
 possession: Under Construction

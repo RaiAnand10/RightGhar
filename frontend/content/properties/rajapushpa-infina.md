@@ -5,8 +5,8 @@ clubhouse: 69,000 Sq. Ft.
 configuration: 3 & 4 BHK
 floors: 55
 id: rajapushpa-infina
-lat: 17.4195
-lng: 78.358
+lat: 17.3806
+lng: 78.3457
 location: Manchirevula, Hyderabad
 openSpace: TBD
 possession: Under Construction

@@ -5,8 +5,8 @@ clubhouse: 1.2 Lakh Sq. Ft.
 configuration: 2 & 3 BHK
 floors: 40
 id: rajapushpa-imperia
-lat: 17.4195
-lng: 78.358
+lat: 17.4740
+lng: 78.2981
 location: Tellapur, Hyderabad
 openSpace: 82%
 possession: Sept. 2027

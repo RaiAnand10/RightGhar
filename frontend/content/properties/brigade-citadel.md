@@ -5,8 +5,8 @@ clubhouse: 53,000 Sq. Ft.
 configuration: 2 & 3 BHK
 floors: 0
 id: brigade-citadel
-lat: 17.4195
-lng: 78.358
+lat: 17.4508
+lng: 78.4222
 location: Moti Nagar, Hyderabad
 openSpace: TBD
 possession: Ready to Move

@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 BHK
 floors: 47
 id: candeur-twins
-lat: 17.4195
-lng: 78.358
+lat: 17.4982
+lng: 78.3568
 location: Miyapur, Hyderabad
 openSpace: TBD
 possession: Under Construction

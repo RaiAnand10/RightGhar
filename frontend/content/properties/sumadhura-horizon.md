@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 BHK & 3+ Study BHK
 floors: 18
 id: sumadhura-horizon
-lat: 17.4195
-lng: 78.358
+lat: 17.4588
+lng: 78.3731
 location: Kondapur, Hyderabad
 openSpace: 72%
 possession: Ready to Move

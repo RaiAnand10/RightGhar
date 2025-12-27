@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3, 4 & 5 BHK
 floors: 44
 id: aparna-deccan-town
-lat: 17.4195
-lng: 78.358
+lat: 17.4292
+lng: 78.3252
 location: Gopanpally-Gachibowli, Hyderabad
 openSpace: TBD
 possession: Under Construction

@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: TBD
 floors: 0
 id: the-eminent-by-ramky
-lat: 17.4195
-lng: 78.358
+lat: 17.3200
+lng: 78.4020
 location: Rajendra Nagar, Hyderabad
 openSpace: TBD
 possession: Under Construction

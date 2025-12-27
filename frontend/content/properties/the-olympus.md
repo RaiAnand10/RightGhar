@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 & 4 BHK
 floors: 44
 id: the-olympus
-lat: 17.4195
-lng: 78.358
+lat: 17.4043
+lng: 78.3305
 location: Financial District, Hyderabad
 openSpace: TBD
 possession: Under Construction

@@ -5,8 +5,8 @@ clubhouse: 37,593 Sq. Ft.
 configuration: 2, 2.5 & 3 BHK
 floors: 22
 id: aparna-cyberheights
-lat: 17.4195
-lng: 78.358
+lat: 17.4418
+lng: 78.2782
 location: Osman Nagar, Hyderabad
 openSpace: TBD
 possession: Under Construction

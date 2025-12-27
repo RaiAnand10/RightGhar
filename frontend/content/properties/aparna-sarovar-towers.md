@@ -5,8 +5,8 @@ clubhouse: 52,932 Sq. Ft.
 configuration: 3 & 4 BHK
 floors: 50
 id: aparna-sarovar-towers
-lat: 17.4195
-lng: 78.358
+lat: 17.4775
+lng: 78.3060
 location: Nallagandla, Hyderabad
 openSpace: TBD
 possession: Under Construction

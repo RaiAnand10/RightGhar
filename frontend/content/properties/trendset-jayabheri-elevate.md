@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 & 4 BHK
 floors: 0
 id: trendset-jayabheri-elevate
-lat: 17.4195
-lng: 78.358
+lat: 17.4588
+lng: 78.3731
 location: Kondapur, Hyderabad
 openSpace: TBD
 possession: Ready to Move

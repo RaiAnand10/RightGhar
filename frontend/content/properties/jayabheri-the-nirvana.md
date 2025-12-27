@@ -5,8 +5,8 @@ clubhouse: 49,000 Sq. Ft.
 configuration: 3 BHK
 floors: 29
 id: jayabheri-the-nirvana
-lat: 17.4195
-lng: 78.358
+lat: 17.4436
+lng: 78.3520
 location: Gachibowli, Hyderabad
 openSpace: 79%
 possession: Ready to Move

@@ -5,8 +5,8 @@ clubhouse: 1,07,000+ Sq. Ft.
 configuration: 3 BHK
 floors: 50
 id: asbl-broadway
-lat: 17.4195
-lng: 78.358
+lat: 17.4043
+lng: 78.3305
 location: Financial District, Hyderabad
 openSpace: TBD
 possession: December 2029

@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 5 BHK
 floors: 0
 id: bellagio-the-prestige-city-hyderabad
-lat: 17.4195
-lng: 78.358
+lat: 17.3200
+lng: 78.4020
 location: Rajendra Nagar, Hyderabad
 openSpace: TBD
 possession: Under Construction

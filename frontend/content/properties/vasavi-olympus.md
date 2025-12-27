@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 & 4 BHK
 floors: 44
 id: vasavi-olympus
-lat: 17.4195
-lng: 78.358
+lat: 17.4218
+lng: 78.3380
 location: Nanakramguda, Hyderabad
 openSpace: TBD
 possession: Under Construction

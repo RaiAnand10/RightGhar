@@ -5,8 +5,8 @@ clubhouse: 72,865 Sq. Ft.
 configuration: 2.5 & 3 BHK
 floors: 42
 id: aparna-newlands
-lat: 17.4195
-lng: 78.358
+lat: 17.4746
+lng: 78.2991
 location: Tellapur, Hyderabad
 openSpace: TBD
 possession: Under Construction

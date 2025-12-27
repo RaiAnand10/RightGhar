@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 2, 2.5 & 3 BHK
 floors: 0
 id: gardens-by-the-brook
-lat: 17.4195
-lng: 78.358
+lat: 17.2627
+lng: 78.3881
 location: Shamshabad, Hyderabad
 openSpace: 76%
 possession: September 2025

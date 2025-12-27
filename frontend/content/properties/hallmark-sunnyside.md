@@ -5,8 +5,8 @@ clubhouse: 22,000 Sq. Ft.
 configuration: 2 & 3 BHK
 floors: 9
 id: hallmark-sunnyside
-lat: 17.4195
-lng: 78.358
+lat: 17.3806
+lng: 78.3457
 location: Manchirevula, Hyderabad
 openSpace: TBD
 possession: Mar 2025

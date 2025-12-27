@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 2 & 3 BHK
 floors: 12
 id: honer-vivantis
-lat: 17.4195
-lng: 78.358
+lat: 17.4454
+lng: 78.3078
 location: Gopanpally, Gachibowli
 openSpace: 76%
 possession: '2019'

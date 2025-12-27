@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 2 & 3 BHK
 floors: 0
 id: vertex-siris-signa
-lat: 17.4195
-lng: 78.358
+lat: 16.5115
+lng: 80.6160
 location: Vijayawada, Andhra Pradesh
 openSpace: TBD
 possession: TBD

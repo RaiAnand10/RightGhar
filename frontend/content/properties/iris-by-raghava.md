@@ -5,8 +5,8 @@ clubhouse: 52,000 Sq. Ft.
 configuration: 4 & 6 BHK
 floors: 45
 id: iris-by-raghava
-lat: 17.4195
-lng: 78.358
+lat: 17.4233
+lng: 78.3806
 location: Raidurgam, Hyderabad
 openSpace: TBD
 possession: July 2025

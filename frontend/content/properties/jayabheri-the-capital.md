@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: TBD
 floors: 15
 id: jayabheri-the-capital
-lat: 17.4195
-lng: 78.358
+lat: 16.5300
+lng: 80.5270
 location: Amravati, Andhra Pradesh
 openSpace: TBD
 possession: Ready to Occupy

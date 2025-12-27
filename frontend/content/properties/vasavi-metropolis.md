@@ -5,8 +5,8 @@ clubhouse: 13,740 Sq. Ft.
 configuration: 2 & 3 BHK
 floors: 17
 id: vasavi-metropolis
-lat: 17.4195
-lng: 78.358
+lat: 17.4025
+lng: 78.5613
 location: Uppal, Hyderabad
 openSpace: 70%
 possession: Dec 2024

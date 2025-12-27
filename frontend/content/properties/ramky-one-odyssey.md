@@ -5,8 +5,8 @@ clubhouse: 50,000 Sq. Ft.
 configuration: 3, 3.5 & 4.5 BHK
 floors: 36
 id: ramky-one-odyssey
-lat: 17.4195
-lng: 78.358
+lat: 17.4043
+lng: 78.3305
 location: Kokapet, Hyderabad
 openSpace: TBD
 possession: Under Construction

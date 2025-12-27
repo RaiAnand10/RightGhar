@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3, 4 & 5 BHK
 floors: 28
 id: aparna-greenscapes
-lat: 17.4195
-lng: 78.358
+lat: 17.5400
+lng: 78.4996
 location: Kompally, Hyderabad
 openSpace: TBD
 possession: Dec 2025

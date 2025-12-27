@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 & 4 BHK
 floors: 0
 id: encanto
-lat: 17.4195
-lng: 78.358
+lat: 17.4000
+lng: 78.3862
 location: Puppalaguda, Hyderabad
 openSpace: TBD
 possession: Under Construction

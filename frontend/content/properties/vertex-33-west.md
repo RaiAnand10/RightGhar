@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 2 & 3 BHK
 floors: 0
 id: vertex-33-west
-lat: 17.4195
-lng: 78.358
+lat: 17.4775
+lng: 78.3060
 location: Nallagandla, Hyderabad
 openSpace: TBD
 possession: Under Construction

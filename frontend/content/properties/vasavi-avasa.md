@@ -5,8 +5,8 @@ clubhouse: 9198 Sq. Ft.
 configuration: 4 BHK
 floors: 0
 id: vasavi-avasa
-lat: 17.4195
-lng: 78.358
+lat: 17.5400
+lng: 78.4996
 location: Kompally, Hyderabad
 openSpace: TBD
 possession: Dec 2026

@@ -5,8 +5,8 @@ clubhouse: 50,000 Sq. Ft.
 configuration: 4 BHK
 floors: 44
 id: the-twins-by-dsr
-lat: 17.4195
-lng: 78.358
+lat: 17.4000
+lng: 78.3862
 location: Puppalaguda, Hyderabad
 openSpace: TBD
 possession: Under Construction

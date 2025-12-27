@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 4 & 5 BHK
 floors: 0
 id: prestige-vaishnaoi-rainbow-waters
-lat: 17.4195
-lng: 78.358
+lat: 17.4142
+lng: 78.3907
 location: Raidurg, Hyderabad
 openSpace: TBD
 possession: Under Construction

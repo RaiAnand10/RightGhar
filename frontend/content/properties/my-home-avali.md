@@ -5,8 +5,8 @@ clubhouse: 70,000 SFT
 configuration: 3 & 4 BHK
 floors: 46
 id: my-home-avali
-lat: 17.4195
-lng: 78.358
+lat: 17.4271
+lng: 78.3289
 location: Gopanpally, Hyderabad
 openSpace: 81%
 possession: Dec 2025

@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 & 4 BHK
 floors: 0
 id: prestige-spring-heights
-lat: 17.4195
-lng: 78.358
+lat: 17.3188
+lng: 78.3927
 location: Budwel, Hyderabad
 openSpace: TBD
 possession: Under Construction

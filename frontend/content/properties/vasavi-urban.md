@@ -5,8 +5,8 @@ clubhouse: 1,00,000 Sq. Ft.
 configuration: 2 BHK
 floors: 23
 id: vasavi-urban
-lat: 17.4195
-lng: 78.358
+lat: 17.5424
+lng: 78.3854
 location: Bachupally, Hyderabad
 openSpace: 70%
 possession: Under Construction

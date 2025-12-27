@@ -5,8 +5,8 @@ clubhouse: 76,500 Sq. Ft.
 configuration: 3 & 4 BHK
 floors: 56
 id: rajapushpa-aurelia
-lat: 17.4195
-lng: 78.358
+lat: 17.4746
+lng: 78.2991
 location: Tellapur, Hyderabad
 openSpace: TBD
 possession: Under Construction

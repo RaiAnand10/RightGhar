@@ -5,8 +5,8 @@ clubhouse: 1,00,000 Sq. Ft.
 configuration: 2, 2.5 & 3 BHK
 floors: 39
 id: my-home-sayuk
-lat: 17.4195
-lng: 78.358
+lat: 17.4740
+lng: 78.2981
 location: Tellapur, Hyderabad
 openSpace: TBD
 possession: Dec 2025

@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3 & 4 BHK
 floors: 37
 id: songs-of-the-sun
-lat: 17.4195
-lng: 78.358
+lat: 17.3606
+lng: 78.4741
 location: Hyderabad, Telangana
 openSpace: TBD
 possession: Under Construction

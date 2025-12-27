@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: TBD
 floors: 15
 id: sanctuary
-lat: 17.4195
-lng: 78.358
+lat: 17.4490
+lng: 78.3831
 location: Hitec City, Hyderabad
 openSpace: TBD
 possession: Under Construction

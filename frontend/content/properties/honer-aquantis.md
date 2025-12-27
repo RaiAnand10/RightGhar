@@ -5,8 +5,8 @@ clubhouse: 50,000 Sq. Ft.
 configuration: 2, 3 BHK & 4 BHK Duplex
 floors: 30
 id: honer-aquantis
-lat: 17.4195
-lng: 78.358
+lat: 17.4271
+lng: 78.3289
 location: Gopanpally, Hyderabad
 openSpace: 81%
 possession: Ready to Move

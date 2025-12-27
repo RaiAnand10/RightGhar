@@ -5,8 +5,8 @@ clubhouse: 1,50,000 Sq. Ft.
 configuration: 2 & 3 BHK
 floors: 49
 id: rajapushpa-sierra
-lat: 17.4195
-lng: 78.358
+lat: 17.4740
+lng: 78.2981
 location: Tellapur, Hyderabad
 openSpace: 76%
 possession: Under Construction

@@ -5,8 +5,8 @@ clubhouse: 60,000 Sq. Ft.
 configuration: 3 BHK
 floors: 33
 id: dsr-altitudes
-lat: 17.4195
-lng: 78.358
+lat: 17.4418
+lng: 78.2782
 location: Osman Nagar, Tellapur
 openSpace: TBD
 possession: Under Construction

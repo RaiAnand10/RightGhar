@@ -5,8 +5,8 @@ clubhouse: 65,000 Sq. Ft.
 configuration: 3, 3.5 & 4 BHK
 floors: 25
 id: honer-signatis
-lat: 17.4195
-lng: 78.358
+lat: 17.4931
+lng: 78.4054
 location: Kukatpally, Hyderabad
 openSpace: TBD
 possession: Dec 2026

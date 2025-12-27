@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 3.5 & 4.5 BHK
 floors: 55
 id: jayabheri-the-pinnacle
-lat: 17.4195
-lng: 78.358
+lat: 17.4043
+lng: 78.3305
 location: Kokapet, Hyderabad
 openSpace: 79%
 possession: June 2028

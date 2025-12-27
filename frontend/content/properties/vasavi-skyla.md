@@ -5,8 +5,8 @@ clubhouse: 50,000 Sq. Ft.
 configuration: 3, 4 & 5 BHK
 floors: 32
 id: vasavi-skyla
-lat: 17.4195
-lng: 78.358
+lat: 17.4588
+lng: 78.3731
 location: Kondapur, Hyderabad
 openSpace: 75%
 possession: December 2026

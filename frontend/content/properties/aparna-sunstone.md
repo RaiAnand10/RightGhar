@@ -5,8 +5,8 @@ clubhouse: 70,000+ Sq. Ft.
 configuration: 3 BHK
 floors: 44
 id: aparna-sunstone
-lat: 17.4195
-lng: 78.358
+lat: 17.4261
+lng: 78.3379
 location: Gopanpally, Hyderabad
 openSpace: TBD
 possession: Under Construction

@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: TBD
 floors: 0
 id: wave-by-raghava
-lat: 17.4195
-lng: 78.358
+lat: 17.3606
+lng: 78.4741
 location: Hyderabad, Telangana
 openSpace: TBD
 possession: Under Construction

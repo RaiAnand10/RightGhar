@@ -5,8 +5,8 @@ clubhouse: 50,000 Sq. Ft.
 configuration: 5 BHK
 floors: 0
 id: honer-richmont
-lat: 17.4195
-lng: 78.358
+lat: 17.4689
+lng: 78.4159
 location: Green Hills Road, Hyderabad
 openSpace: TBD
 possession: Dec 2025

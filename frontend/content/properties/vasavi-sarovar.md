@@ -5,8 +5,8 @@ clubhouse: TBD
 configuration: 2, 2.5, 3, 4 BHK & Sky Villas
 floors: 29
 id: vasavi-sarovar
-lat: 17.4195
-lng: 78.358
+lat: 17.4931
+lng: 78.4054
 location: Kukatpally, Hyderabad
 openSpace: 72%
 possession: December 2027

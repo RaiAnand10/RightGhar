@@ -5,8 +5,8 @@ clubhouse: 30,000 Sq. Ft.
 configuration: 4 BHK
 floors: 17
 id: gvk-sky-city
-lat: 17.4195
-lng: 78.358
+lat: 17.4229
+lng: 78.4620
 location: Raj Bhavan Road, Hyderabad
 openSpace: TBD
 possession: Under Construction

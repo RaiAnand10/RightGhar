@@ -5,8 +5,8 @@ clubhouse: 62,000 Sq. Ft.
 configuration: 2.5 & 3 BHK
 floors: 50
 id: candeur-crescent
-lat: 17.4195
-lng: 78.358
+lat: 17.4667
+lng: 78.3404
 location: Serilingampally, Hyderabad
 openSpace: 80%
 possession: Dec 2025

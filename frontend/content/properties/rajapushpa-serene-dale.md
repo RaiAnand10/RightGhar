@@ -5,8 +5,8 @@ clubhouse: 32,000 Sq. Ft.
 configuration: 4 & 5 BHK
 floors: 0
 id: rajapushpa-serene-dale
-lat: 17.4195
-lng: 78.358
+lat: 17.4740
+lng: 78.2981
 location: Tellapur, Hyderabad
 openSpace: 48%
 possession: Dec 2027

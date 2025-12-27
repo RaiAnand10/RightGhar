@@ -5,8 +5,8 @@ clubhouse: 52,000 Sq. Ft.
 configuration: 2, 2.5 & 3 BHK
 floors: 29
 id: my-home-tridasa
-lat: 17.4195
-lng: 78.358
+lat: 17.4503
+lng: 78.3009
 location: Tellapur, Hyderabad
 openSpace: TBD
 possession: Under Construction

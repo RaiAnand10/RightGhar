@@ -5,8 +5,8 @@ clubhouse: 17,400 Sq. Ft.
 configuration: 3 & 4 BHK
 floors: 19
 id: ramky-one-astra
-lat: 17.4195
-lng: 78.358
+lat: 17.4043
+lng: 78.3305
 location: Kokapet, Hyderabad
 openSpace: TBD
 possession: Under Construction

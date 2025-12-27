@@ -5,8 +5,8 @@ clubhouse: 50,000 Sq. Ft.
 configuration: TBD
 floors: 0
 id: lansum-elena-residences
-lat: 17.4195
-lng: 78.358
+lat: 17.4043
+lng: 78.3305
 location: Kokapet, Hyderabad
 openSpace: TBD
 possession: Under Construction
