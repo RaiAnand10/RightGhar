@@ -34,63 +34,72 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300">
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-md border-b border-black/5 px-4 py-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-8 flex-wrap md:flex-nowrap">
-          <div className="text-center flex-1">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2 tracking-tight hover:scale-[1.02] transition-transform">
-              RightGhar
-            </h1>
-            <p className="text-lg text-slate-500 tracking-wide">Pick right. Live better</p>
-          </div>
+    <div className="min-h-screen bg-stone-50">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-6 py-5">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div>
+              <h1 className="font-display text-2xl text-stone-900">
+                RightGhar
+              </h1>
+              <p className="text-xs text-stone-400 tracking-wide">
+                Find your perfect home
+              </p>
+            </div>
 
-          <div className="flex gap-2 bg-white p-1 rounded-xl shadow-md">
-            <button
-              className={`flex items-center gap-2 px-5 py-3 border-none rounded-lg text-sm font-medium cursor-pointer transition-all whitespace-nowrap ${
-                viewMode === 'grid'
-                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md'
-                  : 'bg-transparent text-slate-500 hover:bg-primary/10 hover:text-primary'
-              }`}
-              onClick={() => setViewMode('grid')}
-              title="Grid View"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="3" width="7" height="7" stroke="currentColor" strokeWidth="2" rx="1"/>
-                <rect x="14" y="3" width="7" height="7" stroke="currentColor" strokeWidth="2" rx="1"/>
-                <rect x="3" y="14" width="7" height="7" stroke="currentColor" strokeWidth="2" rx="1"/>
-                <rect x="14" y="14" width="7" height="7" stroke="currentColor" strokeWidth="2" rx="1"/>
-              </svg>
-              Grid
-            </button>
-            <button
-              className={`flex items-center gap-2 px-5 py-3 border-none rounded-lg text-sm font-medium cursor-pointer transition-all whitespace-nowrap ${
-                viewMode === 'map'
-                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md'
-                  : 'bg-transparent text-slate-500 hover:bg-primary/10 hover:text-primary'
-              }`}
-              onClick={() => setViewMode('map')}
-              title="Map View"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
-              </svg>
-              Map
-            </button>
+            {/* View Toggle */}
+            <div className="flex items-center gap-1 p-1 bg-stone-50 rounded-lg border border-stone-200">
+              <button
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-stone-900 shadow-sm'
+                    : 'text-stone-400 hover:text-stone-600'
+                }`}
+                onClick={() => setViewMode('grid')}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                Grid
+              </button>
+              <button
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'map'
+                    ? 'bg-white text-stone-900 shadow-sm'
+                    : 'text-stone-400 hover:text-stone-600'
+                }`}
+                onClick={() => setViewMode('map')}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                Map
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="p-8 md:p-12 max-w-full">
-        <div className="max-w-[calc(100%-4rem)] mx-auto">
-          <FilterSort
-            propertyCount={filteredAndSortedProperties.length}
-            compareCount={compareList.length}
-            onCompareClick={() => setCompareOpen(true)}
-          />
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Filters */}
+        <FilterSort
+          propertyCount={filteredAndSortedProperties.length}
+          compareCount={compareList.length}
+          onCompareClick={() => setCompareOpen(true)}
+        />
 
-          {viewMode === 'grid' ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {/* Results */}
+        {viewMode === 'grid' ? (
+          <>
+            {filteredAndSortedProperties.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAndSortedProperties.map((property) => (
                   <PropertyCard
                     key={property.metadata.id}
@@ -104,38 +113,42 @@ function App() {
                   />
                 ))}
               </div>
-
-              {filteredAndSortedProperties.length === 0 && (
-                <div className="text-center py-16 px-8 text-slate-500">
-                  <svg className="mx-auto mb-6 text-slate-300" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-16 h-16 rounded-full bg-white border border-stone-200 flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
-                  <h3 className="text-2xl font-semibold text-slate-600 mb-2">No properties found</h3>
-                  <p className="text-base">Try adjusting your filters or search criteria</p>
                 </div>
-              )}
-            </>
-          ) : (
-            <MapView
-              properties={filteredAndSortedProperties}
-              onPropertyClick={handlePropertyClick}
-            />
-          )}
-        </div>
+                <h3 className="font-display text-xl text-stone-900 mb-2">No properties found</h3>
+                <p className="text-sm text-stone-600 max-w-sm">
+                  Try adjusting your filters to see more results
+                </p>
+              </div>
+            )}
+          </>
+        ) : (
+          <MapView
+            properties={filteredAndSortedProperties}
+            onPropertyClick={handlePropertyClick}
+          />
+        )}
       </main>
 
+      {/* Property Modal */}
       <PropertyModal
         property={selectedProperty}
         isOpen={isModalOpen}
         onClose={closeModal}
       />
 
+      {/* Compare Button */}
       <CompareButton
         count={compareList.length}
         onClick={() => setCompareOpen(true)}
       />
 
+      {/* Compare View */}
       {isCompareOpen && (
         <CompareView
           properties={compareList}

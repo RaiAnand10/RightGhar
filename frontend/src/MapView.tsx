@@ -4,7 +4,7 @@ import L from 'leaflet';
 import { Property } from './types';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icon
+// Custom marker icon
 const icon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -21,23 +21,21 @@ interface MapViewProps {
 }
 
 function MapView({ properties, onPropertyClick }: MapViewProps) {
-  // Calculate center based on all properties
   const center: [number, number] = properties.length > 0
     ? [
         properties.reduce((sum, p) => sum + (parseFloat(p.metadata.lat) || 0), 0) / properties.length,
         properties.reduce((sum, p) => sum + (parseFloat(p.metadata.lng) || 0), 0) / properties.length,
       ]
-    : [17.4400, 78.3489]; // Default: Hyderabad center
+    : [17.4400, 78.3489];
 
   useEffect(() => {
-    // Force resize observer update when map is mounted
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 100);
   }, []);
 
   return (
-    <div className="h-[600px] rounded-2xl overflow-hidden shadow-card border border-black/5">
+    <div className="h-[600px] rounded-xl overflow-hidden border border-stone-200 shadow-card">
       <MapContainer
         center={center}
         zoom={13}
@@ -45,7 +43,7 @@ function MapView({ properties, onPropertyClick }: MapViewProps) {
         className="h-full w-full"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
@@ -63,11 +61,11 @@ function MapView({ properties, onPropertyClick }: MapViewProps) {
               }}
             >
               <Tooltip direction="top" offset={[0, -20]} opacity={1}>
-                <div className="p-1">
-                  <h3 className="text-sm font-semibold text-slate-800 mb-1">{property.metadata.project}</h3>
-                  <p className="text-xs text-slate-500 mb-0.5">{property.metadata.builder}</p>
-                  <p className="text-xs text-slate-600 mb-0.5">{property.metadata.configuration}</p>
-                  <p className="text-sm font-bold text-primary">{property.metadata.price}</p>
+                <div className="p-1 min-w-[150px]">
+                  <p className="text-sm font-semibold text-stone-900 mb-0.5">{property.metadata.project}</p>
+                  <p className="text-xs text-stone-400 mb-1">{property.metadata.builder}</p>
+                  <p className="text-xs text-stone-600 mb-1">{property.metadata.configuration}</p>
+                  <p className="text-sm font-semibold text-teal-600">{property.metadata.price}</p>
                 </div>
               </Tooltip>
             </Marker>

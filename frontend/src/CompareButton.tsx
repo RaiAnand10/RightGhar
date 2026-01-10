@@ -1,44 +1,23 @@
-import React from 'react';
-
 interface CompareButtonProps {
   count: number;
   onClick: () => void;
 }
 
-export const CompareButton: React.FC<CompareButtonProps> = ({ count, onClick }) => {
+export function CompareButton({ count, onClick }: CompareButtonProps) {
   if (count === 0) return null;
 
   return (
     <button
-      className="fixed bottom-8 right-8 flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-primary to-secondary text-white border-none rounded-full text-base font-semibold cursor-pointer shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl z-50"
       onClick={onClick}
+      className="fixed bottom-6 right-6 flex items-center gap-3 px-5 py-3 bg-stone-900 text-white rounded-full shadow-modal transition-all duration-300 hover:scale-105 z-50"
     >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9 12h6m-6 4h6"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
       </svg>
-      <span>Compare</span>
-      <span className="flex items-center justify-center min-w-6 h-6 px-2 bg-white/30 rounded-full text-sm font-bold">
+      <span className="text-sm font-semibold">Compare</span>
+      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-teal-600 text-white text-xs font-bold">
         {count}
       </span>
     </button>
   );
-};
+}

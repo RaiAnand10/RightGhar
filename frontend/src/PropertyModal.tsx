@@ -12,56 +12,77 @@ function PropertyModal({ property, isOpen, onClose }: PropertyModalProps) {
 
   const { metadata, content } = property;
 
-  const InfoItem = ({ label, value, isPrice = false }: { label: string; value: string | number; isPrice?: boolean }) => (
-    <div className="bg-slate-50 rounded-lg p-4">
-      <span className="block text-xs text-slate-500 font-medium uppercase tracking-wide mb-1">{label}</span>
-      <span className={`block text-sm font-semibold ${isPrice ? 'text-primary' : 'text-slate-800'}`}>{value}</span>
+  const InfoItem = ({ label, value, highlight = false }: { label: string; value: string | number; highlight?: boolean }) => (
+    <div className="py-3 border-b border-stone-100 last:border-0">
+      <p className="text-xs text-stone-400 uppercase tracking-wider mb-1">{label}</p>
+      <p className={`text-sm font-medium ${highlight ? 'text-teal-600' : 'text-stone-900'}`}>{value}</p>
     </div>
   );
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4"
+      className="fixed inset-0 bg-stone-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl"
+        className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-modal"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-100 border-none text-2xl text-slate-500 cursor-pointer flex items-center justify-center transition-all hover:bg-slate-200 hover:text-slate-700 z-10"
-          onClick={onClose}
-        >
-          ×
-        </button>
-
-        <div className="p-8 pb-6 border-b border-slate-100">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
-            {metadata.project}
-          </h1>
-          <span className="text-base text-slate-500 font-medium">{metadata.builder}</span>
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-stone-200 px-6 py-5 flex items-start justify-between z-10">
+          <div>
+            <h1 className="font-display text-2xl text-stone-900 mb-1">
+              {metadata.project}
+            </h1>
+            <p className="text-sm text-stone-600">{metadata.builder}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-900 hover:bg-stone-50 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        <div className="p-8 border-b border-slate-100">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {/* Quick Info Grid */}
+        <div className="px-6 py-6 border-b border-stone-200">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="col-span-2 md:col-span-1">
+              <InfoItem label="Price" value={metadata.price} highlight />
+            </div>
             <InfoItem label="Location" value={metadata.location} />
             <InfoItem label="Configuration" value={metadata.configuration} />
-            <InfoItem label="Price" value={metadata.price} isPrice />
+            <InfoItem label="Possession" value={metadata.possession} />
+          </div>
+        </div>
+
+        {/* Details Grid */}
+        <div className="px-6 py-6 border-b border-stone-200">
+          <h2 className="text-xs text-stone-400 uppercase tracking-wider mb-4">Project Details</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6">
             <InfoItem label="Total Units" value={metadata.totalUnits} />
             <InfoItem label="Area" value={metadata.area} />
-            <InfoItem label="Possession" value={metadata.possession} />
-            <InfoItem label="Towers" value={`${metadata.towers} Towers, ${metadata.floors}`} />
+            <InfoItem label="Towers" value={`${metadata.towers} Towers`} />
+            <InfoItem label="Floors" value={metadata.floors} />
             <InfoItem label="Unit Sizes" value={metadata.unitSizes} />
-            <InfoItem label="Clubhouse" value={metadata.clubhouse} />
             <InfoItem label="Open Space" value={metadata.openSpace} />
+            <InfoItem label="Clubhouse" value={metadata.clubhouse} />
             <InfoItem label="RERA" value={metadata.rera} />
           </div>
         </div>
 
-        <div
-          className="p-8 prose prose-slate max-w-none prose-headings:text-slate-800 prose-h2:text-xl prose-h2:font-bold prose-h2:mt-6 prose-h2:mb-4 prose-h3:text-lg prose-h3:font-semibold prose-p:text-slate-600 prose-li:text-slate-600"
-          dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(content) }}
-        />
+        {/* Content */}
+        {content && (
+          <div className="px-6 py-6">
+            <h2 className="text-xs text-stone-400 uppercase tracking-wider mb-4">About</h2>
+            <div
+              className="prose prose-sm prose-stone max-w-none prose-headings:font-display prose-headings:text-stone-900 prose-p:text-stone-600 prose-li:text-stone-600 prose-a:text-teal-600"
+              dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(content) }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
