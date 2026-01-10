@@ -1,237 +1,56 @@
-import { useState, useMemo } from 'react'
-import './App.css'
 import PropertyCard from './PropertyCard'
 import PropertyModal from './PropertyModal'
-import FilterSort, { SortOption, FilterState, BHKFilter, PriceRange } from './FilterSort'
+import FilterSort from './FilterSort'
 import { CompareButton } from './CompareButton'
 import { CompareView } from './CompareView'
 import MapView from './MapView'
-import { properties, Property } from './data'
-
-type ViewMode = 'grid' | 'map'
+import { usePropertyStore } from './stores/usePropertyStore'
 
 function App() {
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [compareList, setCompareList] = useState<Property[]>([])
-  const [isCompareOpen, setIsCompareOpen] = useState(false)
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [sortBy, setSortBy] = useState<SortOption>('default')
-  const [filters, setFilters] = useState<FilterState>({
-    city: new Set<string>(),
-    locality: new Set<string>(),
-    builder: new Set<string>(),
-    bhk: new Set<BHKFilter>(),
-    possessionYear: new Set<string>(),
-    priceRange: new Set<PriceRange>(),
-  })
+  const {
+    viewMode,
+    setViewMode,
+    isCompareOpen,
+    setCompareOpen,
+    compareList,
+    isModalOpen,
+    selectedProperty,
+    closeModal,
+    openModal,
+    getFilteredProperties,
+    allProperties,
+    removeFromCompare,
+    addToCompare,
+    toggleCompare,
+    isInCompare,
+  } = usePropertyStore()
 
-  // Compare handlers
-  const handleToggleCompare = (property: Property, e: React.MouseEvent) => {
-    e.stopPropagation()
-    const isInCompare = compareList.some(p => p.metadata.id === property.metadata.id)
-    
-    if (isInCompare) {
-      setCompareList(compareList.filter(p => p.metadata.id !== property.metadata.id))
-    } else {
-      if (compareList.length < 4) {
-        setCompareList([...compareList, property])
-      }
+  const filteredAndSortedProperties = getFilteredProperties()
+
+  const handlePropertyClick = (property: typeof selectedProperty) => {
+    if (property) {
+      openModal(property)
     }
-  }
-
-  const handleRemoveFromCompare = (id: string) => {
-    setCompareList(compareList.filter(p => p.metadata.id !== id))
-  }
-
-  const handleAddToCompare = (property: Property) => {
-    if (compareList.length < 4) {
-      setCompareList([...compareList, property])
-    }
-  }
-
-  const isPropertyInCompare = (property: Property): boolean => {
-    return compareList.some(p => p.metadata.id === property.metadata.id)
-  }
-
-
-  // Extract price from string (e.g., "₹2.25 CR" -> 2.25)
-  const extractPrice = (priceStr: string | undefined): number | null => {
-    if (!priceStr) return null
-    
-    const match = priceStr.match(/₹?\s*(\d+\.?\d*)\s*(CR|Cr|cr|L|Lakh|lakh)?/i)
-    if (!match) return null
-    
-    const value = parseFloat(match[1])
-    const unit = match[2]?.toLowerCase()
-    
-    if (unit?.startsWith('cr')) {
-      return value // Already in crores
-    } else if (unit?.includes('l')) {
-      return value / 100 // Convert lakhs to crores
-    }
-    return value
-  }
-
-  // Extract year from possession string
-  const extractYear = (possessionStr: string | undefined): number | null => {
-    if (!possessionStr) return null
-    
-    const match = possessionStr.match(/\d{4}/)
-    return match ? parseInt(match[0]) : null
-  }
-
-  // Check if property matches BHK filter using regex
-  const matchesBHK = (property: Property, bhkFilters: Set<BHKFilter>): boolean => {
-    if (bhkFilters.size === 0) return true
-    
-    const config = property.metadata.configuration?.toLowerCase() || ''
-    // Match formats like "3 BHK", "3BHK", "3 & 4 BHK", "2, 3 & 4 BHK"
-    // Strategy: Check if the number exists before "bhk" in the string
-    return Array.from(bhkFilters).some(bhk => {
-      // First try exact match like "3 bhk" or "3bhk"
-      const exactRegex = new RegExp(`\\b${bhk}\\s*bhk\\b`, 'i')
-      if (exactRegex.test(config)) return true
-      
-      // Then check if number appears before "bhk" (handles "3 & 4 BHK" format)
-      const bhkIndex = config.indexOf('bhk')
-      if (bhkIndex > 0) {
-        const beforeBhk = config.substring(0, bhkIndex)
-        // Check if the number exists as a standalone number before "bhk"
-        const numberRegex = new RegExp(`\\b${bhk}\\b`)
-        return numberRegex.test(beforeBhk)
-      }
-      
-      return false
-    })
-  }
-
-  // Check if property matches city filter
-  const matchesCity = (property: Property, cityFilters: Set<string>): boolean => {
-    if (cityFilters.size === 0) return true
-    
-    const location = property.metadata.location || ''
-    return Array.from(cityFilters).some(city => location.includes(city))
-  }
-
-  // Check if property matches locality filter
-  const matchesLocality = (property: Property, localityFilters: Set<string>): boolean => {
-    if (localityFilters.size === 0) return true
-    
-    const location = property.metadata.location || ''
-    return Array.from(localityFilters).some(locality => location.includes(locality))
-  }
-
-  // Check if property matches builder filter
-  const matchesBuilder = (property: Property, builderFilters: Set<string>): boolean => {
-    if (builderFilters.size === 0) return true
-    
-    const builder = property.metadata.builder || ''
-    return Array.from(builderFilters).some(b => 
-      builder.toLowerCase().includes(b.toLowerCase())
-    )
-  }
-
-  // Check if property matches possession year filter
-  const matchesPossessionYear = (property: Property, yearFilters: Set<string>): boolean => {
-    if (yearFilters.size === 0) return true
-    
-    const year = extractYear(property.metadata.possession)
-    if (!year) return false
-    
-    return yearFilters.has(year.toString())
-  }
-
-  // Check if property matches price range filter
-  const matchesPriceRange = (property: Property, rangeFilters: Set<PriceRange>): boolean => {
-    if (rangeFilters.size === 0) return true
-    
-    const price = extractPrice(property.metadata.price)
-    if (!price) return false
-    
-    return Array.from(rangeFilters).some(range => {
-      switch (range) {
-        case '0.5-1': return price >= 0.5 && price < 1
-        case '1-1.5': return price >= 1 && price < 1.5
-        case '1.5-2': return price >= 1.5 && price < 2
-        case '2-2.5': return price >= 2 && price < 2.5
-        case '2.5-4': return price >= 2.5 && price < 4
-        case '4-6': return price >= 4 && price < 6
-        case '6-10': return price >= 6 && price < 10
-        case '10+': return price >= 10
-        default: return false
-      }
-    })
-  }
-
-  // Filter and sort properties
-  const filteredAndSortedProperties = useMemo(() => {
-    // Apply filters
-    let filtered = properties.filter(property => 
-      matchesCity(property, filters.city) &&
-      matchesLocality(property, filters.locality) &&
-      matchesBuilder(property, filters.builder) &&
-      matchesBHK(property, filters.bhk) &&
-      matchesPossessionYear(property, filters.possessionYear) &&
-      matchesPriceRange(property, filters.priceRange)
-    )
-
-    // Apply sorting
-    if (sortBy !== 'default') {
-      filtered = [...filtered].sort((a, b) => {
-        if (sortBy === 'price-asc' || sortBy === 'price-desc') {
-          const priceA = extractPrice(a.metadata.price)
-          const priceB = extractPrice(b.metadata.price)
-          
-          // Put properties without price at the end
-          if (priceA === null && priceB === null) return 0
-          if (priceA === null) return 1
-          if (priceB === null) return -1
-          
-          return sortBy === 'price-asc' ? priceA - priceB : priceB - priceA
-        }
-        
-        if (sortBy === 'possession-asc' || sortBy === 'possession-desc') {
-          const yearA = extractYear(a.metadata.possession)
-          const yearB = extractYear(b.metadata.possession)
-          
-          // Put properties without date at the end
-          if (yearA === null && yearB === null) return 0
-          if (yearA === null) return 1
-          if (yearB === null) return -1
-          
-          return sortBy === 'possession-asc' ? yearA - yearB : yearB - yearA
-        }
-        
-        return 0
-      })
-    }
-
-    return filtered
-  }, [properties, sortBy, filters])
-
-  const handlePropertyClick = (property: Property) => {
-    setSelectedProperty(property)
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setTimeout(() => setSelectedProperty(null), 300)
   }
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="header-content">
-          <div className="brand">
-            <h1 className="logo">RightGhar</h1>
-            <p className="tagline">Pick right. Live better</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-md border-b border-black/5 px-4 py-8">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-8 flex-wrap md:flex-nowrap">
+          <div className="text-center flex-1">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2 tracking-tight hover:scale-[1.02] transition-transform">
+              RightGhar
+            </h1>
+            <p className="text-lg text-slate-500 tracking-wide">Pick right. Live better</p>
           </div>
-          
-          <div className="view-toggle">
+
+          <div className="flex gap-2 bg-white p-1 rounded-xl shadow-md">
             <button
-              className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              className={`flex items-center gap-2 px-5 py-3 border-none rounded-lg text-sm font-medium cursor-pointer transition-all whitespace-nowrap ${
+                viewMode === 'grid'
+                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md'
+                  : 'bg-transparent text-slate-500 hover:bg-primary/10 hover:text-primary'
+              }`}
               onClick={() => setViewMode('grid')}
               title="Grid View"
             >
@@ -244,7 +63,11 @@ function App() {
               Grid
             </button>
             <button
-              className={`view-toggle-btn ${viewMode === 'map' ? 'active' : ''}`}
+              className={`flex items-center gap-2 px-5 py-3 border-none rounded-lg text-sm font-medium cursor-pointer transition-all whitespace-nowrap ${
+                viewMode === 'map'
+                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md'
+                  : 'bg-transparent text-slate-500 hover:bg-primary/10 hover:text-primary'
+              }`}
               onClick={() => setViewMode('map')}
               title="Map View"
             >
@@ -257,45 +80,44 @@ function App() {
         </div>
       </header>
 
-      <main className="main-content">
-        <div className="container">
+      <main className="p-8 md:p-12 max-w-full">
+        <div className="max-w-[calc(100%-4rem)] mx-auto">
           <FilterSort
-            sortBy={sortBy}
-            filters={filters}
-            onSortChange={setSortBy}
-            onFilterChange={setFilters}
             propertyCount={filteredAndSortedProperties.length}
             compareCount={compareList.length}
-            onCompareClick={() => setIsCompareOpen(true)}
+            onCompareClick={() => setCompareOpen(true)}
           />
 
           {viewMode === 'grid' ? (
             <>
-              <div className="properties-grid">
-            {filteredAndSortedProperties.map((property) => (
-              <PropertyCard
-                key={property.metadata.id}
-                property={property}
-                onClick={() => handlePropertyClick(property)}
-                isInCompare={isPropertyInCompare(property)}
-                onToggleCompare={(e) => handleToggleCompare(property, e)}
-              />
-            ))}
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {filteredAndSortedProperties.map((property) => (
+                  <PropertyCard
+                    key={property.metadata.id}
+                    property={property}
+                    onClick={() => handlePropertyClick(property)}
+                    isInCompare={isInCompare(property.metadata.id)}
+                    onToggleCompare={(e) => {
+                      e.stopPropagation()
+                      toggleCompare(property)
+                    }}
+                  />
+                ))}
+              </div>
 
-          {filteredAndSortedProperties.length === 0 && (
-            <div className="no-results">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-              </svg>
-              <h3>No properties found</h3>
-              <p>Try adjusting your filters or search criteria</p>
-            </div>
-          )}
+              {filteredAndSortedProperties.length === 0 && (
+                <div className="text-center py-16 px-8 text-slate-500">
+                  <svg className="mx-auto mb-6 text-slate-300" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                  <h3 className="text-2xl font-semibold text-slate-600 mb-2">No properties found</h3>
+                  <p className="text-base">Try adjusting your filters or search criteria</p>
+                </div>
+              )}
             </>
           ) : (
-            <MapView 
+            <MapView
               properties={filteredAndSortedProperties}
               onPropertyClick={handlePropertyClick}
             />
@@ -306,22 +128,21 @@ function App() {
       <PropertyModal
         property={selectedProperty}
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        onClose={closeModal}
       />
 
       <CompareButton
         count={compareList.length}
-        onClick={() => setIsCompareOpen(true)}
+        onClick={() => setCompareOpen(true)}
       />
 
       {isCompareOpen && (
         <CompareView
           properties={compareList}
-          allProperties={properties}
-          onClose={() => setIsCompareOpen(false)}
-          onRemove={handleRemoveFromCompare}
-          onAddMore={() => {}}
-          onAddProperty={handleAddToCompare}
+          allProperties={allProperties}
+          onClose={() => setCompareOpen(false)}
+          onRemove={removeFromCompare}
+          onAddProperty={addToCompare}
         />
       )}
     </div>

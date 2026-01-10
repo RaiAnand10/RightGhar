@@ -90,31 +90,10 @@ function generateDataFile() {
   const tsContent = `// This file is auto-generated. Do not edit manually.
 // Generated on: ${new Date().toISOString()}
 
-export interface PropertyMetadata {
-  id: string;
-  project: string;
-  builder: string;
-  location: string;
-  configuration: string;
-  totalUnits: number;
-  area: string;
-  price: string;
-  possession: string;
-  rera: string;
-  towers: number;
-  floors: string;
-  unitSizes: string;
-  clubhouse: string;
-  openSpace: string;
-  lat: string;
-  lng: string;
-  url?: string;
-}
+import { Property, PropertyMetadata } from './types';
 
-export interface Property {
-  metadata: PropertyMetadata;
-  content: string;
-}
+// Re-export types for backward compatibility
+export type { Property, PropertyMetadata };
 
 export const properties: Property[] = ${JSON.stringify(properties, null, 2)};
 

@@ -1,93 +1,27 @@
 import { useState, useRef, useEffect } from 'react'
-import './FilterSort.css'
+import { SortOption, BHKFilter, PriceRange, FilterState } from './types'
+import {
+  priceRanges,
+  possessionYears,
+  bhkOptions,
+  cityOptions,
+  localityOptions,
+  builderOptions
+} from './constants/filterOptions'
+import { usePropertyStore } from './stores/usePropertyStore'
 
-export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'possession-asc' | 'possession-desc'
-export type BHKFilter = '2' | '3' | '4'
-export type PriceRange = '0.5-1' | '1-1.5' | '1.5-2' | '2-2.5' | '2.5-4' | '4-6' | '6-10' | '10+'
-
-export interface FilterState {
-  city: Set<string>
-  locality: Set<string>
-  builder: Set<string>
-  bhk: Set<BHKFilter>
-  possessionYear: Set<string>
-  priceRange: Set<PriceRange>
-}
+// Re-export types for backward compatibility
+export type { SortOption, BHKFilter, PriceRange, FilterState }
 
 interface FilterSortProps {
-  sortBy: SortOption
-  filters: FilterState
-  onSortChange: (sort: SortOption) => void
-  onFilterChange: (filters: FilterState) => void
   propertyCount: number
   compareCount: number
   onCompareClick: () => void
 }
 
-const priceRanges: { value: PriceRange; label: string }[] = [
-  { value: '0.5-1', label: '₹50L - ₹1Cr' },
-  { value: '1-1.5', label: '₹1Cr - ₹1.5Cr' },
-  { value: '1.5-2', label: '₹1.5Cr - ₹2Cr' },
-  { value: '2-2.5', label: '₹2Cr - ₹2.5Cr' },
-  { value: '2.5-4', label: '₹2.5Cr - ₹4Cr' },
-  { value: '4-6', label: '₹4Cr - ₹6Cr' },
-  { value: '6-10', label: '₹6Cr - ₹10Cr' },
-  { value: '10+', label: '₹10Cr+' },
-]
+function FilterSort({ propertyCount, compareCount, onCompareClick }: FilterSortProps) {
+  const { filters, sortBy, setFilters, setSortBy, clearFilters } = usePropertyStore()
 
-const possessionYears = ['2026', '2027', '2028', '2029']
-const bhkOptions: BHKFilter[] = ['2', '3', '4']
-const cityOptions = ['Hyderabad', 'Bangalore']
-const localityOptions: { [key: string]: string[] } = {
-  'Hyderabad': [
-    'Kokapet',
-    'Tellapur', 
-    'Kondapur',
-    'Financial District',
-    'Osman Nagar',
-    'Neopolis',
-    'Narsingi',
-    'Nallagandla',
-    'Gopanpally',
-    'Rajendra Nagar',
-    'Puppalaguda',
-    'Kompally',
-    'Uppal',
-    'Miyapur',
-    'Manchirevula',
-    'Kukatpally',
-    'Kollur',
-    'Gachibowli',
-    'Bachupally',
-    'Shamshabad'
-  ],
-  'Bangalore': []
-}
-
-const builderOptions = [
-  'Aparna Constructions',
-  'Ramky Estates',
-  'Rajapushpa Properties',
-  'Vasavi group',
-  'Hallmark builders',
-  'Myscape',
-  'My Home Group',
-  'My Home Constructions',
-  'DSR builders',
-  'Vertex homes',
-  'Prestige Constructions',
-  'Jayabheri',
-  'Candeur',
-  'Raghava',
-  'Lansum',
-  'Honer Homes',
-  'Sumadhura',
-  'GHR infra',
-  'Brigade',
-  'ASBL'
-]
-
-function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCount, compareCount, onCompareClick }: FilterSortProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const [localitySearch, setLocalitySearch] = useState('')
   const [builderSearch, setBuilderSearch] = useState('')
@@ -115,7 +49,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     } else {
       newBHK.add(bhk)
     }
-    onFilterChange({ ...filters, bhk: newBHK })
+    setFilters({ ...filters, bhk: newBHK })
   }
 
   const toggleCity = (city: string) => {
@@ -126,7 +60,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
       newCities.add(city)
     }
     // Clear locality when city changes
-    onFilterChange({ ...filters, city: newCities, locality: new Set() })
+    setFilters({ ...filters, city: newCities, locality: new Set() })
   }
 
   const toggleLocality = (locality: string) => {
@@ -136,7 +70,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     } else {
       newLocalities.add(locality)
     }
-    onFilterChange({ ...filters, locality: newLocalities })
+    setFilters({ ...filters, locality: newLocalities })
   }
 
   const toggleBuilder = (builder: string) => {
@@ -146,7 +80,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     } else {
       newBuilders.add(builder)
     }
-    onFilterChange({ ...filters, builder: newBuilders })
+    setFilters({ ...filters, builder: newBuilders })
   }
 
   const togglePossessionYear = (year: string) => {
@@ -156,7 +90,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     } else {
       newYears.add(year)
     }
-    onFilterChange({ ...filters, possessionYear: newYears })
+    setFilters({ ...filters, possessionYear: newYears })
   }
 
   const togglePriceRange = (range: PriceRange) => {
@@ -166,19 +100,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     } else {
       newRanges.add(range)
     }
-    onFilterChange({ ...filters, priceRange: newRanges })
-  }
-
-  const clearAllFilters = () => {
-    onFilterChange({
-      city: new Set(),
-      locality: new Set(),
-      builder: new Set(),
-      bhk: new Set(),
-      possessionYear: new Set(),
-      priceRange: new Set(),
-    })
-    onSortChange('default')
+    setFilters({ ...filters, priceRange: newRanges })
   }
 
   const activeFiltersCount = filters.city.size + filters.locality.size + filters.builder.size + filters.bhk.size + filters.possessionYear.size + filters.priceRange.size
@@ -187,7 +109,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
   const availableLocalities = filters.city.size > 0
     ? Array.from(filters.city).flatMap(city => localityOptions[city] || [])
     : []
-  
+
   const filteredLocalities = availableLocalities.filter(locality =>
     locality.toLowerCase().includes(localitySearch.toLowerCase())
   )
@@ -208,32 +130,39 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
     }
   }
 
+  // Base button styles
+  const filterButtonBase = "px-5 py-2.5 bg-white border-2 border-slate-200 rounded-lg text-sm font-medium text-slate-600 cursor-pointer transition-all flex items-center gap-2 whitespace-nowrap hover:border-primary hover:text-primary hover:bg-primary/5 md:w-auto w-full md:justify-start justify-between"
+  const filterButtonActive = "bg-gradient-to-r from-primary to-secondary text-white border-transparent hover:from-primary-dark hover:to-secondary-dark hover:border-transparent hover:text-white hover:bg-none"
+
   return (
-    <div className="filter-sort-container">
-      <div className="filter-sort-controls">
-        <div className="filter-buttons-group">
+    <div className="mb-8">
+      <div className="flex justify-between items-center gap-6 p-6 bg-white rounded-xl shadow-card flex-wrap lg:flex-row flex-col lg:items-center items-stretch">
+        <div className="flex gap-4 flex-wrap flex-1 md:flex-row flex-col">
           {/* City Filter */}
-          <div className="filter-dropdown" ref={el => dropdownRefs.current['city'] = el}>
+          <div className="relative" ref={el => dropdownRefs.current['city'] = el}>
             <button
-              className={`filter-button-inline ${filters.city.size > 0 ? 'has-selection' : ''}`}
+              className={`${filterButtonBase} ${filters.city.size > 0 ? filterButtonActive : ''}`}
               onClick={() => toggleDropdown('city')}
             >
               City
               {filters.city.size > 0 && (
-                <span className="filter-badge">{filters.city.size}</span>
+                <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 bg-white/30 rounded-full text-xs font-semibold">
+                  {filters.city.size}
+                </span>
               )}
-              <span className="dropdown-arrow">{openDropdown === 'city' ? '▲' : '▼'}</span>
+              <span className="text-[0.625rem] opacity-70">{openDropdown === 'city' ? '▲' : '▼'}</span>
             </button>
             {openDropdown === 'city' && (
-              <div className="dropdown-menu">
+              <div className="absolute top-[calc(100%+0.5rem)] left-0 bg-white border border-slate-200 rounded-lg shadow-dropdown z-[1000] min-w-[180px] max-h-[300px] overflow-y-auto py-2 md:w-auto w-full">
                 {cityOptions.map(city => (
-                  <label key={city} className="dropdown-option">
+                  <label key={city} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-sm text-slate-600 hover:bg-primary/5">
                     <input
                       type="checkbox"
                       checked={filters.city.has(city)}
                       onChange={() => toggleCity(city)}
+                      className="w-4 h-4 cursor-pointer accent-primary"
                     />
-                    <span>{city}</span>
+                    <span className="flex-1 select-none">{city}</span>
                   </label>
                 ))}
               </div>
@@ -242,42 +171,45 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
 
           {/* Locality Filter - Only show if at least one city is selected */}
           {filters.city.size > 0 && (
-            <div className="filter-dropdown" ref={el => dropdownRefs.current['locality'] = el}>
+            <div className="relative" ref={el => dropdownRefs.current['locality'] = el}>
               <button
-                className={`filter-button-inline ${filters.locality.size > 0 ? 'has-selection' : ''}`}
+                className={`${filterButtonBase} ${filters.locality.size > 0 ? filterButtonActive : ''}`}
                 onClick={() => toggleDropdown('locality')}
               >
                 Locality
                 {filters.locality.size > 0 && (
-                  <span className="filter-badge">{filters.locality.size}</span>
+                  <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 bg-white/30 rounded-full text-xs font-semibold">
+                    {filters.locality.size}
+                  </span>
                 )}
-                <span className="dropdown-arrow">{openDropdown === 'locality' ? '▲' : '▼'}</span>
+                <span className="text-[0.625rem] opacity-70">{openDropdown === 'locality' ? '▲' : '▼'}</span>
               </button>
               {openDropdown === 'locality' && (
-                <div className="dropdown-menu dropdown-menu-searchable">
+                <div className="absolute top-[calc(100%+0.5rem)] left-0 bg-white border border-slate-200 rounded-lg shadow-dropdown z-[1000] min-w-[220px] p-0 md:w-auto w-full">
                   <input
                     type="text"
-                    className="dropdown-search-input"
+                    className="w-full px-4 py-3 border-none border-b border-slate-200 text-sm outline-none bg-primary/5 text-slate-800 focus:bg-white"
                     placeholder="Type to search..."
                     value={localitySearch}
                     onChange={(e) => setLocalitySearch(e.target.value)}
                     onClick={(e) => e.stopPropagation()}
                     autoFocus
                   />
-                  <div className="dropdown-options-list">
+                  <div className="max-h-[250px] overflow-y-auto py-2">
                     {filteredLocalities.length > 0 ? (
                       filteredLocalities.map(locality => (
-                        <label key={locality} className="dropdown-option">
+                        <label key={locality} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-sm text-slate-600 hover:bg-primary/5">
                           <input
                             type="checkbox"
                             checked={filters.locality.has(locality)}
                             onChange={() => toggleLocality(locality)}
+                            className="w-4 h-4 cursor-pointer accent-primary"
                           />
-                          <span>{locality}</span>
+                          <span className="flex-1 select-none">{locality}</span>
                         </label>
                       ))
                     ) : (
-                      <div className="dropdown-no-results">No localities found</div>
+                      <div className="p-4 text-center text-slate-400 text-sm">No localities found</div>
                     )}
                   </div>
                 </div>
@@ -286,42 +218,45 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
           )}
 
           {/* Builder Filter */}
-          <div className="filter-dropdown" ref={el => dropdownRefs.current['builder'] = el}>
+          <div className="relative" ref={el => dropdownRefs.current['builder'] = el}>
             <button
-              className={`filter-button-inline ${filters.builder.size > 0 ? 'has-selection' : ''}`}
+              className={`${filterButtonBase} ${filters.builder.size > 0 ? filterButtonActive : ''}`}
               onClick={() => toggleDropdown('builder')}
             >
               Builder
               {filters.builder.size > 0 && (
-                <span className="filter-badge">{filters.builder.size}</span>
+                <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 bg-white/30 rounded-full text-xs font-semibold">
+                  {filters.builder.size}
+                </span>
               )}
-              <span className="dropdown-arrow">{openDropdown === 'builder' ? '▲' : '▼'}</span>
+              <span className="text-[0.625rem] opacity-70">{openDropdown === 'builder' ? '▲' : '▼'}</span>
             </button>
             {openDropdown === 'builder' && (
-              <div className="dropdown-menu dropdown-menu-searchable">
+              <div className="absolute top-[calc(100%+0.5rem)] left-0 bg-white border border-slate-200 rounded-lg shadow-dropdown z-[1000] min-w-[220px] p-0 md:w-auto w-full">
                 <input
                   type="text"
-                  className="dropdown-search-input"
+                  className="w-full px-4 py-3 border-none border-b border-slate-200 text-sm outline-none bg-primary/5 text-slate-800 focus:bg-white"
                   placeholder="Type to search..."
                   value={builderSearch}
                   onChange={(e) => setBuilderSearch(e.target.value)}
                   onClick={(e) => e.stopPropagation()}
                   autoFocus
                 />
-                <div className="dropdown-options-list">
+                <div className="max-h-[250px] overflow-y-auto py-2">
                   {filteredBuilders.length > 0 ? (
                     filteredBuilders.map(builder => (
-                      <label key={builder} className="dropdown-option">
+                      <label key={builder} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-sm text-slate-600 hover:bg-primary/5">
                         <input
                           type="checkbox"
                           checked={filters.builder.has(builder)}
                           onChange={() => toggleBuilder(builder)}
+                          className="w-4 h-4 cursor-pointer accent-primary"
                         />
-                        <span>{builder}</span>
+                        <span className="flex-1 select-none">{builder}</span>
                       </label>
                     ))
                   ) : (
-                    <div className="dropdown-no-results">No builders found</div>
+                    <div className="p-4 text-center text-slate-400 text-sm">No builders found</div>
                   )}
                 </div>
               </div>
@@ -329,27 +264,30 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
           </div>
 
           {/* Configuration Filter */}
-          <div className="filter-dropdown" ref={el => dropdownRefs.current['config'] = el}>
+          <div className="relative" ref={el => dropdownRefs.current['config'] = el}>
             <button
-              className={`filter-button-inline ${filters.bhk.size > 0 ? 'has-selection' : ''}`}
+              className={`${filterButtonBase} ${filters.bhk.size > 0 ? filterButtonActive : ''}`}
               onClick={() => toggleDropdown('config')}
             >
               Configuration
               {filters.bhk.size > 0 && (
-                <span className="filter-badge">{filters.bhk.size}</span>
+                <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 bg-white/30 rounded-full text-xs font-semibold">
+                  {filters.bhk.size}
+                </span>
               )}
-              <span className="dropdown-arrow">{openDropdown === 'config' ? '▲' : '▼'}</span>
+              <span className="text-[0.625rem] opacity-70">{openDropdown === 'config' ? '▲' : '▼'}</span>
             </button>
             {openDropdown === 'config' && (
-              <div className="dropdown-menu">
+              <div className="absolute top-[calc(100%+0.5rem)] left-0 bg-white border border-slate-200 rounded-lg shadow-dropdown z-[1000] min-w-[180px] max-h-[300px] overflow-y-auto py-2 md:w-auto w-full">
                 {bhkOptions.map(bhk => (
-                  <label key={bhk} className="dropdown-option">
+                  <label key={bhk} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-sm text-slate-600 hover:bg-primary/5">
                     <input
                       type="checkbox"
                       checked={filters.bhk.has(bhk)}
                       onChange={() => toggleBHK(bhk)}
+                      className="w-4 h-4 cursor-pointer accent-primary"
                     />
-                    <span>{bhk} BHK</span>
+                    <span className="flex-1 select-none">{bhk} BHK</span>
                   </label>
                 ))}
               </div>
@@ -357,27 +295,30 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
           </div>
 
           {/* Possession Year Filter */}
-          <div className="filter-dropdown" ref={el => dropdownRefs.current['possession'] = el}>
+          <div className="relative" ref={el => dropdownRefs.current['possession'] = el}>
             <button
-              className={`filter-button-inline ${filters.possessionYear.size > 0 ? 'has-selection' : ''}`}
+              className={`${filterButtonBase} ${filters.possessionYear.size > 0 ? filterButtonActive : ''}`}
               onClick={() => toggleDropdown('possession')}
             >
               Possession Year
               {filters.possessionYear.size > 0 && (
-                <span className="filter-badge">{filters.possessionYear.size}</span>
+                <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 bg-white/30 rounded-full text-xs font-semibold">
+                  {filters.possessionYear.size}
+                </span>
               )}
-              <span className="dropdown-arrow">{openDropdown === 'possession' ? '▲' : '▼'}</span>
+              <span className="text-[0.625rem] opacity-70">{openDropdown === 'possession' ? '▲' : '▼'}</span>
             </button>
             {openDropdown === 'possession' && (
-              <div className="dropdown-menu">
+              <div className="absolute top-[calc(100%+0.5rem)] left-0 bg-white border border-slate-200 rounded-lg shadow-dropdown z-[1000] min-w-[180px] max-h-[300px] overflow-y-auto py-2 md:w-auto w-full">
                 {possessionYears.map(year => (
-                  <label key={year} className="dropdown-option">
+                  <label key={year} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-sm text-slate-600 hover:bg-primary/5">
                     <input
                       type="checkbox"
                       checked={filters.possessionYear.has(year)}
                       onChange={() => togglePossessionYear(year)}
+                      className="w-4 h-4 cursor-pointer accent-primary"
                     />
-                    <span>{year}</span>
+                    <span className="flex-1 select-none">{year}</span>
                   </label>
                 ))}
               </div>
@@ -385,27 +326,30 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
           </div>
 
           {/* Price Range Filter */}
-          <div className="filter-dropdown" ref={el => dropdownRefs.current['price'] = el}>
+          <div className="relative" ref={el => dropdownRefs.current['price'] = el}>
             <button
-              className={`filter-button-inline ${filters.priceRange.size > 0 ? 'has-selection' : ''}`}
+              className={`${filterButtonBase} ${filters.priceRange.size > 0 ? filterButtonActive : ''}`}
               onClick={() => toggleDropdown('price')}
             >
               Price Range
               {filters.priceRange.size > 0 && (
-                <span className="filter-badge">{filters.priceRange.size}</span>
+                <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 bg-white/30 rounded-full text-xs font-semibold">
+                  {filters.priceRange.size}
+                </span>
               )}
-              <span className="dropdown-arrow">{openDropdown === 'price' ? '▲' : '▼'}</span>
+              <span className="text-[0.625rem] opacity-70">{openDropdown === 'price' ? '▲' : '▼'}</span>
             </button>
             {openDropdown === 'price' && (
-              <div className="dropdown-menu">
+              <div className="absolute top-[calc(100%+0.5rem)] left-0 bg-white border border-slate-200 rounded-lg shadow-dropdown z-[1000] min-w-[180px] max-h-[300px] overflow-y-auto py-2 md:w-auto w-full">
                 {priceRanges.map(({ value, label }) => (
-                  <label key={value} className="dropdown-option">
+                  <label key={value} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-sm text-slate-600 hover:bg-primary/5">
                     <input
                       type="checkbox"
                       checked={filters.priceRange.has(value)}
                       onChange={() => togglePriceRange(value)}
+                      className="w-4 h-4 cursor-pointer accent-primary"
                     />
-                    <span>{label}</span>
+                    <span className="flex-1 select-none">{label}</span>
                   </label>
                 ))}
               </div>
@@ -413,8 +357,11 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
           </div>
         </div>
 
-        <div className="sort-and-clear">
-          <button className="compare-header-button" onClick={onCompareClick}>
+        <div className="flex items-center gap-4 lg:flex-row flex-col lg:w-auto w-full">
+          <button
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-secondary text-white border-none rounded-lg text-sm font-semibold cursor-pointer transition-all whitespace-nowrap relative hover:from-primary-dark hover:to-secondary-dark hover:-translate-y-0.5 hover:shadow-lg lg:w-auto w-full justify-center"
+            onClick={onCompareClick}
+          >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
@@ -433,17 +380,21 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
             </svg>
             Compare Projects
             {compareCount > 0 && (
-              <span className="compare-count-badge-header">{compareCount}</span>
+              <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 bg-white/30 rounded-full text-xs font-bold ml-1">
+                {compareCount}
+              </span>
             )}
           </button>
 
-          <div className="sort-control">
-            <label htmlFor="sort-select">Sort:</label>
+          <div className="flex items-center gap-2 lg:w-auto w-full">
+            <label htmlFor="sort-select" className="text-sm font-medium text-slate-500 whitespace-nowrap">
+              Sort:
+            </label>
             <select
               id="sort-select"
               value={sortBy}
-              onChange={(e) => onSortChange(e.target.value as SortOption)}
-              className="sort-select"
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="px-4 py-2.5 pr-10 border-2 border-slate-200 rounded-lg text-sm text-slate-600 bg-white cursor-pointer transition-all appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%23475569%22%20d%3D%22M6%209L1%204h10z%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.75rem_center] min-w-[180px] hover:border-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 lg:min-w-[180px] lg:flex-none flex-1"
             >
               <option value="default">Default</option>
               <option value="price-asc">Price: Low to High</option>
@@ -454,7 +405,10 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
           </div>
 
           {activeFiltersCount > 0 && (
-            <button className="clear-filters-button" onClick={clearAllFilters}>
+            <button
+              className="px-5 py-2.5 bg-red-50 border-2 border-red-200 rounded-lg text-sm font-medium text-red-600 cursor-pointer transition-all whitespace-nowrap hover:bg-red-200 hover:border-red-300 lg:w-auto w-full"
+              onClick={clearFilters}
+            >
               Clear All ({activeFiltersCount})
             </button>
           )}
@@ -462,7 +416,7 @@ function FilterSort({ sortBy, filters, onSortChange, onFilterChange, propertyCou
       </div>
 
       {propertyCount > 0 && (
-        <div className="results-count">
+        <div className="mt-4 text-center text-sm text-slate-500 font-medium">
           Showing {propertyCount} {propertyCount === 1 ? 'property' : 'properties'}
         </div>
       )}

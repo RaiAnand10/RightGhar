@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
-import { Property } from './data';
+import { Property } from './types';
 import 'leaflet/dist/leaflet.css';
-import './MapView.css';
 
 // Fix for default marker icon
 const icon = L.icon({
@@ -38,18 +37,18 @@ function MapView({ properties, onPropertyClick }: MapViewProps) {
   }, []);
 
   return (
-    <div className="map-view-container">
+    <div className="h-[600px] rounded-2xl overflow-hidden shadow-card border border-black/5">
       <MapContainer
         center={center}
         zoom={13}
         scrollWheelZoom={true}
-        className="map-container"
+        className="h-full w-full"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
+
         {properties.map((property) => {
           const { lat, lng } = property.metadata;
           if (!lat || !lng) return null;
@@ -64,11 +63,11 @@ function MapView({ properties, onPropertyClick }: MapViewProps) {
               }}
             >
               <Tooltip direction="top" offset={[0, -20]} opacity={1}>
-                <div className="map-tooltip">
-                  <h3>{property.metadata.project}</h3>
-                  <p className="map-tooltip-builder">{property.metadata.builder}</p>
-                  <p className="map-tooltip-config">{property.metadata.configuration}</p>
-                  <p className="map-tooltip-price">{property.metadata.price}</p>
+                <div className="p-1">
+                  <h3 className="text-sm font-semibold text-slate-800 mb-1">{property.metadata.project}</h3>
+                  <p className="text-xs text-slate-500 mb-0.5">{property.metadata.builder}</p>
+                  <p className="text-xs text-slate-600 mb-0.5">{property.metadata.configuration}</p>
+                  <p className="text-sm font-bold text-primary">{property.metadata.price}</p>
                 </div>
               </Tooltip>
             </Marker>

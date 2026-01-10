@@ -1,31 +1,10 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-12-27T16:00:42.190Z
+// Generated on: 2026-01-10T09:06:28.188Z
 
-export interface PropertyMetadata {
-  id: string;
-  project: string;
-  builder: string;
-  location: string;
-  configuration: string;
-  totalUnits: number;
-  area: string;
-  price: string;
-  possession: string;
-  rera: string;
-  towers: number;
-  floors: string;
-  unitSizes: string;
-  clubhouse: string;
-  openSpace: string;
-  lat: string;
-  lng: string;
-  url?: string;
-}
+import { Property, PropertyMetadata } from './types';
 
-export interface Property {
-  metadata: PropertyMetadata;
-  content: string;
-}
+// Re-export types for backward compatibility
+export type { Property, PropertyMetadata };
 
 export const properties: Property[] = [
   {

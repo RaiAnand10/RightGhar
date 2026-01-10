@@ -1,5 +1,5 @@
-import { Property } from './data';
-import './PropertyModal.css';
+import { Property } from './types';
+import { renderMarkdownToHtml } from './utils/markdownParser';
 
 interface PropertyModalProps {
   property: Property | null;
@@ -12,98 +12,55 @@ function PropertyModal({ property, isOpen, onClose }: PropertyModalProps) {
 
   const { metadata, content } = property;
 
-  // Convert markdown to HTML (basic conversion)
-  const renderContent = (text: string) => {
-    return text
-      .split('\n')
-      .map((line, index) => {
-        // Headers
-        if (line.startsWith('### ')) {
-          return `<h3 key="${index}">${line.substring(4)}</h3>`;
-        }
-        if (line.startsWith('## ')) {
-          return `<h2 key="${index}">${line.substring(3)}</h2>`;
-        }
-        if (line.startsWith('# ')) {
-          return `<h1 key="${index}">${line.substring(2)}</h1>`;
-        }
-        // Lists
-        if (line.startsWith('- ')) {
-          return `<li key="${index}">${line.substring(2)}</li>`;
-        }
-        // Bold
-        line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        // Paragraphs
-        if (line.trim() !== '') {
-          return `<p key="${index}">${line}</p>`;
-        }
-        return '';
-      })
-      .join('');
-  };
+  const InfoItem = ({ label, value, isPrice = false }: { label: string; value: string | number; isPrice?: boolean }) => (
+    <div className="bg-slate-50 rounded-lg p-4">
+      <span className="block text-xs text-slate-500 font-medium uppercase tracking-wide mb-1">{label}</span>
+      <span className={`block text-sm font-semibold ${isPrice ? 'text-primary' : 'text-slate-800'}`}>{value}</span>
+    </div>
+  );
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>×</button>
-        
-        <div className="modal-header">
-          <h1 className="modal-title">{metadata.project}</h1>
-          <span className="modal-builder">{metadata.builder}</span>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-100 border-none text-2xl text-slate-500 cursor-pointer flex items-center justify-center transition-all hover:bg-slate-200 hover:text-slate-700 z-10"
+          onClick={onClose}
+        >
+          ×
+        </button>
+
+        <div className="p-8 pb-6 border-b border-slate-100">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+            {metadata.project}
+          </h1>
+          <span className="text-base text-slate-500 font-medium">{metadata.builder}</span>
         </div>
 
-        <div className="modal-quick-info">
-          <div className="quick-info-grid">
-            <div className="quick-info-item">
-              <span className="quick-info-label">Location</span>
-              <span className="quick-info-value">{metadata.location}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Configuration</span>
-              <span className="quick-info-value">{metadata.configuration}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Price</span>
-              <span className="quick-info-value price">{metadata.price}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Total Units</span>
-              <span className="quick-info-value">{metadata.totalUnits}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Area</span>
-              <span className="quick-info-value">{metadata.area}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Possession</span>
-              <span className="quick-info-value">{metadata.possession}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Towers</span>
-              <span className="quick-info-value">{metadata.towers} Towers, {metadata.floors}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Unit Sizes</span>
-              <span className="quick-info-value">{metadata.unitSizes}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Clubhouse</span>
-              <span className="quick-info-value">{metadata.clubhouse}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">Open Space</span>
-              <span className="quick-info-value">{metadata.openSpace}</span>
-            </div>
-            <div className="quick-info-item">
-              <span className="quick-info-label">RERA</span>
-              <span className="quick-info-value">{metadata.rera}</span>
-            </div>
+        <div className="p-8 border-b border-slate-100">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <InfoItem label="Location" value={metadata.location} />
+            <InfoItem label="Configuration" value={metadata.configuration} />
+            <InfoItem label="Price" value={metadata.price} isPrice />
+            <InfoItem label="Total Units" value={metadata.totalUnits} />
+            <InfoItem label="Area" value={metadata.area} />
+            <InfoItem label="Possession" value={metadata.possession} />
+            <InfoItem label="Towers" value={`${metadata.towers} Towers, ${metadata.floors}`} />
+            <InfoItem label="Unit Sizes" value={metadata.unitSizes} />
+            <InfoItem label="Clubhouse" value={metadata.clubhouse} />
+            <InfoItem label="Open Space" value={metadata.openSpace} />
+            <InfoItem label="RERA" value={metadata.rera} />
           </div>
         </div>
 
-        <div 
-          className="modal-body"
-          dangerouslySetInnerHTML={{ __html: renderContent(content) }}
+        <div
+          className="p-8 prose prose-slate max-w-none prose-headings:text-slate-800 prose-h2:text-xl prose-h2:font-bold prose-h2:mt-6 prose-h2:mb-4 prose-h3:text-lg prose-h3:font-semibold prose-p:text-slate-600 prose-li:text-slate-600"
+          dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(content) }}
         />
       </div>
     </div>

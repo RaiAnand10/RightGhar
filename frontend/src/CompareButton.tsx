@@ -1,5 +1,4 @@
 import React from 'react';
-import './CompareButton.css';
 
 interface CompareButtonProps {
   count: number;
@@ -10,7 +9,10 @@ export const CompareButton: React.FC<CompareButtonProps> = ({ count, onClick }) 
   if (count === 0) return null;
 
   return (
-    <button className="compare-floating-button" onClick={onClick}>
+    <button
+      className="fixed bottom-8 right-8 flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-primary to-secondary text-white border-none rounded-full text-base font-semibold cursor-pointer shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl z-50"
+      onClick={onClick}
+    >
       <svg
         width="24"
         height="24"
@@ -33,8 +35,10 @@ export const CompareButton: React.FC<CompareButtonProps> = ({ count, onClick }) 
           strokeLinejoin="round"
         />
       </svg>
-      <span className="compare-text">Compare</span>
-      <span className="compare-count-badge">{count}</span>
+      <span>Compare</span>
+      <span className="flex items-center justify-center min-w-6 h-6 px-2 bg-white/30 rounded-full text-sm font-bold">
+        {count}
+      </span>
     </button>
   );
 };
