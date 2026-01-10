@@ -24,10 +24,10 @@
   font-family: 'DM Serif Display', Georgia, serif;
 }
 
-/* Base styles */
-* {
-  margin: 0;
-  padding: 0;
+/* Base styles - Note: Tailwind v4 handles resets, avoid overriding utilities */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
