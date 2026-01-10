@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2026-01-10T14:15:33.473Z
+// Generated on: 2026-01-10T15:45:08.396Z
 
 import { Property, PropertyMetadata } from './types';
 

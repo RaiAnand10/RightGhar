@@ -9,6 +9,7 @@ import {
   builderOptions
 } from './constants/filterOptions'
 import { usePropertyStore } from './stores/usePropertyStore'
+import { useFavoritesStore } from './stores/useFavoritesStore'
 
 export type { SortOption, BHKFilter, PriceRange, FilterState }
 
@@ -20,6 +21,8 @@ interface FilterSortProps {
 
 function FilterSort({ propertyCount, compareCount, onCompareClick }: FilterSortProps) {
   const { filters, sortBy, setFilters, setSortBy, clearFilters } = usePropertyStore()
+  const { showOnlyFavorites, setShowOnlyFavorites, getFavoritesCount } = useFavoritesStore()
+  const favoritesCount = getFavoritesCount()
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const [localitySearch, setLocalitySearch] = useState('')
@@ -175,9 +178,9 @@ function FilterSort({ propertyCount, compareCount, onCompareClick }: FilterSortP
   )
 
   return (
-    <div className="mb-8">
+    <div className="mb-6 sm:mb-8">
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible">
         {/* City */}
         <FilterDropdown id="city" label="City" count={filters.city.size}>
           <div className="py-2">
@@ -294,6 +297,38 @@ function FilterSort({ propertyCount, compareCount, onCompareClick }: FilterSortP
 
         {/* Divider */}
         <div className="w-px h-8 bg-stone-200 mx-1 hidden sm:block" />
+
+        {/* Favorites Filter */}
+        <button
+          onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+            showOnlyFavorites
+              ? 'bg-rose-50 text-rose-600 border border-rose-200'
+              : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-300'
+          }`}
+        >
+          <svg
+            className="w-4 h-4"
+            fill={showOnlyFavorites ? 'currentColor' : 'none'}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+            />
+          </svg>
+          Favorites
+          {favoritesCount > 0 && (
+            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-xs ${
+              showOnlyFavorites ? 'bg-rose-600 text-white' : 'bg-stone-100 text-stone-600'
+            }`}>
+              {favoritesCount}
+            </span>
+          )}
+        </button>
 
         {/* Sort */}
         <div className="relative" ref={el => dropdownRefs.current['sort'] = el}>
