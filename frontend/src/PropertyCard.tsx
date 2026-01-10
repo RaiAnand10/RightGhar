@@ -6,9 +6,10 @@ interface PropertyCardProps {
   onClick: () => void;
   isInCompare: boolean;
   onToggleCompare: (e: React.MouseEvent) => void;
+  onAddQuote: (e: React.MouseEvent) => void;
 }
 
-function PropertyCard({ property, onClick, isInCompare, onToggleCompare }: PropertyCardProps) {
+function PropertyCard({ property, onClick, isInCompare, onToggleCompare, onAddQuote }: PropertyCardProps) {
   const { metadata } = property;
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const favorited = isFavorite(metadata.id);
@@ -23,8 +24,11 @@ function PropertyCard({ property, onClick, isInCompare, onToggleCompare }: Prope
     const possession = metadata.possession?.toLowerCase() || '';
     if (possession.includes('ready') || possession.includes('completed')) {
       return { text: 'Ready to Move', className: 'bg-emerald-100 text-emerald-700' };
-    } else if (possession.includes('2024') || possession.includes('2025')) {
-      return { text: metadata.possession, className: 'bg-amber-100 text-amber-700' };
+    } else if (possession.includes('under') || possession.includes('construction')) {
+      return { text: 'Under Construction', className: 'bg-amber-100 text-amber-700' };
+    } else if (possession && possession !== 'tbd') {
+      // Show "Possession: Date" for specific dates to make it clear
+      return { text: `Possession: ${metadata.possession}`, className: 'bg-blue-100 text-blue-700' };
     }
     return { text: metadata.possession || 'TBD', className: 'bg-stone-100 text-stone-600' };
   };
@@ -48,37 +52,55 @@ function PropertyCard({ property, onClick, isInCompare, onToggleCompare }: Prope
           </div>
         </div>
 
-        {/* Top Actions Row */}
+        {/* Top Row: Config Badge Left, Action Buttons Right */}
         <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
           {/* Configuration Badge */}
           <span className="px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-xs font-semibold text-stone-700 shadow-sm">
             {metadata.configuration}
           </span>
 
-          {/* Favorite Button */}
-          <button
-            onClick={handleFavoriteClick}
-            className={`p-2 rounded-full shadow-sm transition-all duration-200 ${
-              favorited
-                ? 'bg-rose-500 text-white'
-                : 'bg-white/90 backdrop-blur-sm text-stone-400 hover:text-rose-500'
-            }`}
-            title={favorited ? 'Remove from favorites' : 'Add to favorites'}
-          >
-            <svg
-              className="w-4 h-4"
-              fill={favorited ? 'currentColor' : 'none'}
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+          {/* Vertical Stack: Favorite + Compare */}
+          <div className="flex flex-col gap-2">
+            {/* Favorite Button */}
+            <button
+              onClick={handleFavoriteClick}
+              className={`p-2 rounded-full shadow-sm transition-all duration-200 ${
+                favorited
+                  ? 'bg-rose-500 text-white'
+                  : 'bg-white/90 backdrop-blur-sm text-stone-400 hover:text-rose-500'
+              }`}
+              title={favorited ? 'Remove from favorites' : 'Add to favorites'}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-4 h-4"
+                fill={favorited ? 'currentColor' : 'none'}
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                />
+              </svg>
+            </button>
+
+            {/* Compare Button */}
+            <button
+              onClick={onToggleCompare}
+              className={`p-2 rounded-full shadow-sm transition-all duration-200 ${
+                isInCompare
+                  ? 'bg-teal-600 text-white'
+                  : 'bg-white/90 backdrop-blur-sm text-stone-400 hover:text-teal-600'
+              }`}
+              title={isInCompare ? 'Remove from compare' : 'Add to compare'}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Bottom Badges Row */}
@@ -128,18 +150,17 @@ function PropertyCard({ property, onClick, isInCompare, onToggleCompare }: Prope
 
         {/* Footer Actions */}
         <div className="flex items-center justify-between mt-3">
-          <span className="text-[10px] text-stone-400 font-mono">
+          <span className="text-xs text-stone-400 font-mono">
             RERA: {metadata.rera}
           </span>
           <button
-            onClick={onToggleCompare}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-              isInCompare
-                ? 'bg-teal-600 text-white'
-                : 'bg-stone-100 text-stone-600 hover:bg-teal-50 hover:text-teal-600'
-            }`}
+            onClick={onAddQuote}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 flex items-center gap-1.5"
           >
-            {isInCompare ? '✓ Added' : '+ Compare'}
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Share Price
           </button>
         </div>
       </div>

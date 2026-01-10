@@ -9,7 +9,6 @@ import {
   builderOptions
 } from './constants/filterOptions'
 import { usePropertyStore } from './stores/usePropertyStore'
-import { useFavoritesStore } from './stores/useFavoritesStore'
 
 export type { SortOption, BHKFilter, PriceRange, FilterState }
 
@@ -21,8 +20,6 @@ interface FilterSortProps {
 
 function FilterSort({ propertyCount, compareCount, onCompareClick }: FilterSortProps) {
   const { filters, sortBy, setFilters, setSortBy, clearFilters } = usePropertyStore()
-  const { showOnlyFavorites, setShowOnlyFavorites, getFavoritesCount } = useFavoritesStore()
-  const favoritesCount = getFavoritesCount()
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const [localitySearch, setLocalitySearch] = useState('')
@@ -298,38 +295,6 @@ function FilterSort({ propertyCount, compareCount, onCompareClick }: FilterSortP
         {/* Divider */}
         <div className="w-px h-8 bg-stone-200 mx-1 hidden sm:block" />
 
-        {/* Favorites Filter */}
-        <button
-          onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-            showOnlyFavorites
-              ? 'bg-rose-50 text-rose-600 border border-rose-200'
-              : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-300'
-          }`}
-        >
-          <svg
-            className="w-4 h-4"
-            fill={showOnlyFavorites ? 'currentColor' : 'none'}
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-            />
-          </svg>
-          Favorites
-          {favoritesCount > 0 && (
-            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-xs ${
-              showOnlyFavorites ? 'bg-rose-600 text-white' : 'bg-stone-100 text-stone-600'
-            }`}>
-              {favoritesCount}
-            </span>
-          )}
-        </button>
-
         {/* Sort */}
         <div className="relative" ref={el => dropdownRefs.current['sort'] = el}>
           <button
@@ -394,8 +359,8 @@ function FilterSort({ propertyCount, compareCount, onCompareClick }: FilterSortP
               : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-300'
           }`}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
           </svg>
           Compare
           {compareCount > 0 && (

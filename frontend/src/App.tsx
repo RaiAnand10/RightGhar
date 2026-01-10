@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import PropertyCard from './PropertyCard'
 import PropertyModal from './PropertyModal'
 import FilterSort from './FilterSort'
@@ -10,6 +11,9 @@ import { ValueProposition } from './components/ValueProposition'
 import { Footer } from './components/Footer'
 import { usePropertyStore } from './stores/usePropertyStore'
 import { useFavoritesStore } from './stores/useFavoritesStore'
+
+// Number of properties to show per page (3 columns x 5 rows = 15)
+const PROPERTIES_PER_PAGE = 15
 
 function App() {
   const {
@@ -32,14 +36,49 @@ function App() {
 
   const { showOnlyFavorites, isFavorite } = useFavoritesStore()
 
+  // Pagination state
+  const [visibleCount, setVisibleCount] = useState(PROPERTIES_PER_PAGE)
+  // Initial tab for modal (used when opening from Add Quote button)
+  const [initialModalTab, setInitialModalTab] = useState<'overview' | 'amenities' | 'details' | 'prices' | 'reviews' | 'gallery' | 'notes'>('overview')
+
+  // Listen for openCompare event from footer
+  useEffect(() => {
+    const handleOpenCompare = () => setCompareOpen(true);
+    window.addEventListener('openCompare', handleOpenCompare);
+    return () => window.removeEventListener('openCompare', handleOpenCompare);
+  }, [setCompareOpen]);
+
   // Get filtered properties and apply favorites filter
   const filteredProperties = getFilteredProperties()
   const filteredAndSortedProperties = showOnlyFavorites
     ? filteredProperties.filter(p => isFavorite(p.metadata.id))
     : filteredProperties
 
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(PROPERTIES_PER_PAGE)
+  }, [filteredAndSortedProperties.length])
+
+  // Get only the visible properties
+  const visibleProperties = filteredAndSortedProperties.slice(0, visibleCount)
+  const hasMoreProperties = visibleCount < filteredAndSortedProperties.length
+  const remainingCount = filteredAndSortedProperties.length - visibleCount
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + PROPERTIES_PER_PAGE)
+  }
+
   const handlePropertyClick = (property: typeof selectedProperty) => {
     if (property) {
+      setInitialModalTab('overview')
+      openModal(property)
+    }
+  }
+
+  const handleAddQuote = (property: typeof selectedProperty, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (property) {
+      setInitialModalTab('prices')
       openModal(property)
     }
   }
@@ -66,9 +105,6 @@ function App() {
                 <h2 className="font-display text-xl sm:text-2xl text-stone-900">
                   Browse Properties
                 </h2>
-                <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                  {filteredAndSortedProperties.length} newly launched projects
-                </p>
               </div>
 
               {/* View Toggle */}
@@ -121,20 +157,42 @@ function App() {
         {viewMode === 'grid' ? (
           <>
             {filteredAndSortedProperties.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {filteredAndSortedProperties.map((property) => (
-                  <PropertyCard
-                    key={property.metadata.id}
-                    property={property}
-                    onClick={() => handlePropertyClick(property)}
-                    isInCompare={isInCompare(property.metadata.id)}
-                    onToggleCompare={(e) => {
-                      e.stopPropagation()
-                      toggleCompare(property)
-                    }}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {visibleProperties.map((property) => (
+                    <PropertyCard
+                      key={property.metadata.id}
+                      property={property}
+                      onClick={() => handlePropertyClick(property)}
+                      isInCompare={isInCompare(property.metadata.id)}
+                      onToggleCompare={(e) => {
+                        e.stopPropagation()
+                        toggleCompare(property)
+                      }}
+                      onAddQuote={(e) => handleAddQuote(property, e)}
+                    />
+                  ))}
+                </div>
+                
+                {/* Load More Button */}
+                {hasMoreProperties && (
+                  <div className="flex flex-col items-center mt-8 sm:mt-12">
+                    <button
+                      onClick={handleLoadMore}
+                      className="group flex items-center gap-2 px-8 py-3 bg-white border-2 border-stone-200 hover:border-emerald-500 text-stone-700 hover:text-emerald-600 rounded-full font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <span>Load More Properties</span>
+                      <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    <p className="text-sm text-stone-500 mt-3">
+                      Showing {visibleCount} of {filteredAndSortedProperties.length} properties
+                      {remainingCount > 0 && ` • ${remainingCount} more available`}
+                    </p>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-16 h-16 rounded-full bg-white border border-stone-200 flex items-center justify-center mb-4">
@@ -166,6 +224,7 @@ function App() {
         property={selectedProperty}
         isOpen={isModalOpen}
         onClose={closeModal}
+        initialTab={initialModalTab}
       />
 
       {/* Compare Button */}

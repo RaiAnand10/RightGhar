@@ -1,20 +1,7 @@
 import { usePropertyStore } from '../stores/usePropertyStore'
 
 export function HeroSection() {
-  const { allProperties, toggleFilter, clearFilters } = usePropertyStore()
-  
-  // Calculate stats
-  const totalProperties = allProperties.length
-  const uniqueBuilders = new Set(allProperties.map(p => p.metadata.builder)).size
-  
-  // Extract city from location string (format: "Locality, City")
-  const extractCity = (location: string): string => {
-    const parts = location.split(',')
-    return parts.length > 1 ? parts[parts.length - 1].trim() : parts[0].trim()
-  }
-  
-  const cities = [...new Set(allProperties.map(p => extractCity(p.metadata.location)))].filter(Boolean).sort()
-  const uniqueLocations = new Set(allProperties.map(p => p.metadata.location.split(',')[0]?.trim())).size
+  const { toggleFilter, clearFilters } = usePropertyStore()
 
   const handleCityClick = (city: string) => {
     if (city === 'all') {
@@ -45,19 +32,18 @@ export function HeroSection() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
             </span>
-            <span className="text-xs sm:text-sm text-white/90 font-medium">India's Only Aggregator for New Launches</span>
+            <span className="text-xs sm:text-sm text-white/90 font-medium">One Platform for New Launch & Under-Construction Homes</span>
           </div>
 
           {/* Headline */}
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-4 sm:mb-6">
-            Find Your Dream Home
-            <span className="block text-teal-400">Before Anyone Else</span>
+            Find Your Right Ghar            <span className="block text-teal-400">Before Anyone Else</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-base sm:text-lg md:text-xl text-stone-300 max-w-2xl mx-auto mb-8 sm:mb-10 px-4">
-            Discover newly launched properties across India. Compare projects, verify RERA details, 
-            and make informed decisions—all in one place.
+            Filter from 100+ new launch and under construction projects, compare them, 
+            get price history and reviews - all in one place.
           </p>
 
           {/* Quick City Selection */}
@@ -68,30 +54,37 @@ export function HeroSection() {
             >
               Explore All Properties
             </button>
-            {cities.slice(0, 4).map(city => (
-              <button
-                key={city}
-                onClick={() => handleCityClick(city)}
-                className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm sm:text-base font-medium hover:bg-white/20 transition-colors"
-              >
-                {city}
-              </button>
-            ))}
+            <button
+              onClick={() => handleCityClick('Hyderabad')}
+              className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm sm:text-base font-medium hover:bg-white/20 transition-colors"
+            >
+              Hyderabad
+            </button>
+            <button
+              onClick={() => handleCityClick('Bangalore')}
+              className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm sm:text-base font-medium hover:bg-white/20 transition-colors"
+            >
+              Bangalore
+            </button>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-3xl mx-auto">
+        <div className="grid grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
           <div className="text-center">
-            <div className="font-display text-2xl sm:text-4xl md:text-5xl text-white mb-1 sm:mb-2">{totalProperties}</div>
-            <div className="text-[10px] sm:text-sm text-stone-400 uppercase tracking-wider">Properties</div>
+            <div className="font-display text-2xl sm:text-4xl md:text-5xl text-white mb-1 sm:mb-2">100+</div>
+            <div className="text-[10px] sm:text-sm text-stone-400 uppercase tracking-wider">Projects</div>
           </div>
-          <div className="text-center border-x border-white/10">
-            <div className="font-display text-2xl sm:text-4xl md:text-5xl text-white mb-1 sm:mb-2">{uniqueBuilders}+</div>
+          <div className="text-center border-l border-white/10">
+            <div className="font-display text-2xl sm:text-4xl md:text-5xl text-white mb-1 sm:mb-2">20+</div>
             <div className="text-[10px] sm:text-sm text-stone-400 uppercase tracking-wider">Builders</div>
           </div>
-          <div className="text-center">
-            <div className="font-display text-2xl sm:text-4xl md:text-5xl text-white mb-1 sm:mb-2">{uniqueLocations}+</div>
+          <div className="text-center border-l border-white/10">
+            <div className="font-display text-2xl sm:text-4xl md:text-5xl text-white mb-1 sm:mb-2">2</div>
+            <div className="text-[10px] sm:text-sm text-stone-400 uppercase tracking-wider">Cities</div>
+          </div>
+          <div className="text-center border-l border-white/10">
+            <div className="font-display text-2xl sm:text-4xl md:text-5xl text-white mb-1 sm:mb-2">50+</div>
             <div className="text-[10px] sm:text-sm text-stone-400 uppercase tracking-wider">Locations</div>
           </div>
         </div>

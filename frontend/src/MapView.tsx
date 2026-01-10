@@ -35,7 +35,7 @@ function MapView({ properties, onPropertyClick }: MapViewProps) {
   }, []);
 
   return (
-    <div className="h-[600px] rounded-xl overflow-hidden border border-stone-200 shadow-card">
+    <div className="h-[600px] rounded-xl overflow-hidden border border-stone-200 shadow-card relative z-0">
       <MapContainer
         center={center}
         zoom={13}

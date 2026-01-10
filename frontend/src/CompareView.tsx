@@ -50,7 +50,7 @@ export function CompareView({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden shadow-modal"
+        className="bg-white rounded-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden shadow-modal flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -73,7 +73,7 @@ export function CompareView({
 
         {/* Content */}
         {properties.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-8">
+          <div className="flex flex-col items-center justify-start pt-8 pb-80 px-8">
             <div className="w-16 h-16 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
@@ -94,7 +94,7 @@ export function CompareView({
                 Add Property
               </button>
               {showAddDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-stone-200 rounded-xl shadow-dropdown z-10">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white border border-stone-200 rounded-xl shadow-dropdown z-10">
                   <input
                     type="text"
                     placeholder="Search properties..."
