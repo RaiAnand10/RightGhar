@@ -9,10 +9,19 @@
   --color-secondary-dark: #63408a;
 
   --font-family-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
 
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --shadow-card-hover: 0 8px 24px rgba(102, 126, 234, 0.15);
-  --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
+/* Custom utility classes for shadows */
+@utility shadow-card {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+@utility shadow-card-hover {
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+}
+
+@utility shadow-dropdown {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Base styles */
