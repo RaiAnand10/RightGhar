@@ -43,3 +43,21 @@ Thumbs.db
 # Cache
 .cache/
 .parcel-cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+*.egg-info/
+*.egg
+.eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+nohup.out
+
+# Database
+*.sqlite3

@@ -32,9 +32,17 @@ function App() {
     addToCompare,
     toggleCompare,
     isInCompare,
+    loading,
+    error,
+    fetchProperties,
   } = usePropertyStore()
 
   const { showOnlyFavorites, isFavorite } = useFavoritesStore()
+
+  // Fetch properties from API on mount
+  useEffect(() => {
+    fetchProperties()
+  }, [fetchProperties])
 
   // Pagination state
   const [visibleCount, setVisibleCount] = useState(PROPERTIES_PER_PAGE)
@@ -146,6 +154,36 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-12 h-12 border-4 border-stone-200 border-t-teal-500 rounded-full animate-spin mb-4"></div>
+            <p className="text-stone-500">Loading properties...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+            </div>
+            <h3 className="font-display text-xl text-stone-900 mb-2">Failed to load properties</h3>
+            <p className="text-sm text-stone-600 mb-4">{error}</p>
+            <button
+              onClick={() => fetchProperties()}
+              className="px-6 py-2.5 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* Filters & Content - only show when data is loaded */}
+        {!loading && !error && (
+        <>
         {/* Filters */}
         <FilterSort
           propertyCount={filteredAndSortedProperties.length}
@@ -212,6 +250,8 @@ function App() {
             properties={filteredAndSortedProperties}
             onPropertyClick={handlePropertyClick}
           />
+        )}
+        </>
         )}
       </main>
       </div> {/* End properties-section */}

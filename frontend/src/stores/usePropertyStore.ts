@@ -1,11 +1,17 @@
 import { create } from 'zustand'
 import { Property, FilterState, SortOption, BHKFilter, PriceRange, ViewMode } from '../types'
-import { properties } from '../data'
+import { fetchAllProjects, fetchProjectDetail } from '../api'
+import { apiListItemToProperty, apiDetailToProperty } from '../apiAdapter'
 import { filterProperties, sortProperties } from '../utils/propertyHelpers'
 
 interface PropertyStore {
-  // All properties (from data)
+  // All properties (from API)
   allProperties: Property[]
+  loading: boolean
+  error: string | null
+
+  // Fetch
+  fetchProperties: () => Promise<void>
 
   // Filters
   filters: FilterState
@@ -30,7 +36,7 @@ interface PropertyStore {
   // Modal
   selectedProperty: Property | null
   isModalOpen: boolean
-  openModal: (property: Property) => void
+  openModal: (property: Property) => Promise<void>
   closeModal: () => void
 
   // View
@@ -51,8 +57,22 @@ const initialFilters: FilterState = {
 }
 
 export const usePropertyStore = create<PropertyStore>((set, get) => ({
-  // All properties
-  allProperties: properties,
+  // All properties — starts empty, fetched from API
+  allProperties: [],
+  loading: true,
+  error: null,
+
+  fetchProperties: async () => {
+    try {
+      set({ loading: true, error: null })
+      const items = await fetchAllProjects()
+      const properties = items.map(apiListItemToProperty)
+      set({ allProperties: properties, loading: false })
+    } catch (err) {
+      console.error('Failed to fetch properties:', err)
+      set({ error: (err as Error).message, loading: false })
+    }
+  },
 
   // Filters
   filters: initialFilters,
@@ -141,7 +161,19 @@ export const usePropertyStore = create<PropertyStore>((set, get) => ({
   selectedProperty: null,
   isModalOpen: false,
 
-  openModal: (property) => set({ selectedProperty: property, isModalOpen: true }),
+  openModal: async (property) => {
+    // Show modal immediately with listing data
+    set({ selectedProperty: property, isModalOpen: true })
+    // Fetch full detail in background and update
+    try {
+      const detail = await fetchProjectDetail(property.metadata.id)
+      const fullProperty = apiDetailToProperty(detail)
+      set({ selectedProperty: fullProperty })
+    } catch (err) {
+      console.error('Failed to fetch project detail:', err)
+      // Keep showing listing data — modal still works with partial data
+    }
+  },
 
   closeModal: () => {
     set({ isModalOpen: false })
