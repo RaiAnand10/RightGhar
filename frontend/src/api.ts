@@ -183,3 +183,24 @@ export async function removeFavorite(slug: string): Promise<void> {
     credentials: 'include',
   });
 }
+
+// --- Chat (AIGHAR) ---
+
+export interface ChatResponse {
+  response: string;
+  references: ProjectListItem[];
+}
+
+export async function sendChatMessage(
+  session_id: string,
+  message: string,
+): Promise<ChatResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/chat`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id, message }),
+  });
+  if (!res.ok) throw new Error('Chat request failed');
+  return res.json();
+}

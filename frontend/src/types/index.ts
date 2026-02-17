@@ -42,4 +42,4 @@ export interface FilterState {
 }
 
 // View types
-export type ViewMode = 'grid' | 'map';
+export type ViewMode = 'grid' | 'map' | 'ai';
