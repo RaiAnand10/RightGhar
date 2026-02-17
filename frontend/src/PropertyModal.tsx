@@ -1,8 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Property } from './types';
 import { renderMarkdownToHtml } from './utils/markdownParser';
 import { useFavoritesStore } from './stores/useFavoritesStore';
 import { usePropertyStore } from './stores/usePropertyStore';
+import {
+  fetchQuotes, submitQuote, PriceQuoteSummary,
+  fetchReviews, submitReview, ReviewSummary,
+  fetchNote, saveNote,
+} from './api';
 
 interface PropertyModalProps {
   property: Property | null;
@@ -18,11 +23,79 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const { toggleCompare, isInCompare } = usePropertyStore();
 
-  // State for user contributions (in-memory only for now)
+  // Price quote state
   const [priceQuote, setPriceQuote] = useState('');
+  const [quoteConfig, setQuoteConfig] = useState('');
+  const [quoteSummary, setQuoteSummary] = useState<PriceQuoteSummary | null>(null);
+  const [quotesLoading, setQuotesLoading] = useState(false);
+  const [quoteSubmitting, setQuoteSubmitting] = useState(false);
+
+  // Review state
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState(0);
+  const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
+  // Notes state
   const [userNote, setUserNote] = useState('');
+  const [noteLoading, setNoteLoading] = useState(false);
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [noteSavedAt, setNoteSavedAt] = useState<string | null>(null);
+
+  const slug = property?.metadata.id ?? '';
+
+  // Load quotes when prices tab is selected
+  const loadQuotes = useCallback(async () => {
+    if (!slug) return;
+    setQuotesLoading(true);
+    try {
+      const data = await fetchQuotes(slug);
+      setQuoteSummary(data);
+    } catch { /* ignore */ }
+    setQuotesLoading(false);
+  }, [slug]);
+
+  // Load reviews when reviews tab is selected
+  const loadReviews = useCallback(async () => {
+    if (!slug) return;
+    setReviewsLoading(true);
+    try {
+      const data = await fetchReviews(slug);
+      setReviewSummary(data);
+      // Pre-fill form with own review if exists
+      const mine = data.reviews.find(r => r.is_mine);
+      if (mine) {
+        setReviewRating(mine.rating);
+        setReviewText(mine.review_text);
+      }
+    } catch { /* ignore */ }
+    setReviewsLoading(false);
+  }, [slug]);
+
+  // Load note when notes tab is selected
+  const loadNote = useCallback(async () => {
+    if (!slug) return;
+    setNoteLoading(true);
+    try {
+      const data = await fetchNote(slug);
+      if (data && data.note_text) {
+        setUserNote(data.note_text);
+        setNoteSavedAt(data.updated_at);
+      } else {
+        setUserNote('');
+        setNoteSavedAt(null);
+      }
+    } catch { /* ignore */ }
+    setNoteLoading(false);
+  }, [slug]);
+
+  // Fetch data when tab changes
+  useEffect(() => {
+    if (activeTab === 'prices') loadQuotes();
+    if (activeTab === 'reviews') loadReviews();
+    if (activeTab === 'notes') loadNote();
+  }, [activeTab, slug, loadQuotes, loadReviews, loadNote]);
 
   // Reset tab when initialTab or property changes
   useEffect(() => {
@@ -374,6 +447,24 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
                 <p className="text-2xl font-display text-teal-800">{metadata.price || 'Price On Request'}</p>
               </div>
 
+              {/* Community Price Aggregates */}
+              {quoteSummary && quoteSummary.count > 0 && (
+                <div className="mb-6 grid grid-cols-3 gap-3">
+                  <div className="bg-stone-50 rounded-xl p-4 text-center">
+                    <p className="text-xl font-display text-stone-900">₹{quoteSummary.avg_price?.toLocaleString()}</p>
+                    <p className="text-xs text-stone-500 uppercase tracking-wider">Avg /sqft</p>
+                  </div>
+                  <div className="bg-stone-50 rounded-xl p-4 text-center">
+                    <p className="text-xl font-display text-stone-900">₹{quoteSummary.min_price?.toLocaleString()}</p>
+                    <p className="text-xs text-stone-500 uppercase tracking-wider">Min /sqft</p>
+                  </div>
+                  <div className="bg-stone-50 rounded-xl p-4 text-center">
+                    <p className="text-xl font-display text-stone-900">₹{quoteSummary.max_price?.toLocaleString()}</p>
+                    <p className="text-xs text-stone-500 uppercase tracking-wider">Max /sqft</p>
+                  </div>
+                </div>
+              )}
+
               {/* Add Your Quote Section */}
               <div className="mb-8">
                 <h3 className="text-sm font-medium text-stone-900 mb-3 flex items-center gap-2">
@@ -383,42 +474,78 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
                 <p className="text-sm text-stone-500 mb-4">Help others by sharing the price you were quoted by the builder.</p>
                 
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs text-stone-500 uppercase tracking-wider mb-2">Price per Sq.Ft (₹)</label>
-                    <input
-                      type="text"
-                      value={priceQuote}
-                      onChange={(e) => setPriceQuote(e.target.value)}
-                      placeholder="e.g., 5500"
-                      className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-stone-900"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-stone-500 uppercase tracking-wider mb-2">Price per Sq.Ft (₹) *</label>
+                      <input
+                        type="number"
+                        value={priceQuote}
+                        onChange={(e) => setPriceQuote(e.target.value)}
+                        placeholder="e.g., 5500"
+                        className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-stone-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-stone-500 uppercase tracking-wider mb-2">Configuration (optional)</label>
+                      <input
+                        type="text"
+                        value={quoteConfig}
+                        onChange={(e) => setQuoteConfig(e.target.value)}
+                        placeholder="e.g., 3 BHK"
+                        className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-stone-900"
+                      />
+                    </div>
                   </div>
                   <button
-                    onClick={() => {
-                      if (priceQuote) {
-                        alert(`Thank you! Your quote of ₹${priceQuote}/sqft has been recorded. (Backend not connected yet)`);
+                    disabled={quoteSubmitting}
+                    onClick={async () => {
+                      const price = parseInt(priceQuote, 10);
+                      if (!price || price <= 0) return;
+                      setQuoteSubmitting(true);
+                      try {
+                        await submitQuote(slug, price, quoteConfig || undefined);
                         setPriceQuote('');
-                      }
+                        setQuoteConfig('');
+                        await loadQuotes();
+                      } catch { /* ignore */ }
+                      setQuoteSubmitting(false);
                     }}
-                    className="px-6 py-2.5 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors"
+                    className="px-6 py-2.5 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors disabled:opacity-50"
                   >
-                    Submit Quote
+                    {quoteSubmitting ? 'Submitting...' : 'Submit Quote'}
                   </button>
                 </div>
               </div>
 
-              {/* Price History Placeholder */}
+              {/* Existing Quotes */}
               <div>
-                <h3 className="text-xs text-stone-400 uppercase tracking-wider mb-4">Price History</h3>
-                <div className="h-48 bg-stone-50 rounded-xl border border-dashed border-stone-300 flex items-center justify-center">
-                  <div className="text-center">
-                    <svg className="w-12 h-12 text-stone-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-                    </svg>
-                    <p className="text-sm text-stone-400">Price trend graph coming soon</p>
-                    <p className="text-xs text-stone-400 mt-1">Be the first to contribute!</p>
+                <h3 className="text-xs text-stone-400 uppercase tracking-wider mb-4">
+                  Community Quotes {quoteSummary ? `(${quoteSummary.count})` : ''}
+                </h3>
+                {quotesLoading ? (
+                  <p className="text-sm text-stone-400 text-center py-8">Loading...</p>
+                ) : quoteSummary && quoteSummary.quotes.length > 0 ? (
+                  <div className="space-y-3">
+                    {quoteSummary.quotes.map((q) => (
+                      <div key={q.id} className={`p-3 rounded-lg border ${q.is_mine ? 'border-teal-200 bg-teal-50' : 'border-stone-200 bg-stone-50'}`}>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <span className="text-lg font-semibold text-stone-900">₹{q.price_per_sqft.toLocaleString()}/sqft</span>
+                            {q.configuration && <span className="ml-2 text-sm text-stone-500">({q.configuration})</span>}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {q.is_mine && <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">You</span>}
+                            <span className="text-xs text-stone-400">{new Date(q.created_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  <div className="h-32 bg-stone-50 rounded-xl border border-dashed border-stone-300 flex items-center justify-center">
+                    <p className="text-sm text-stone-400">No quotes yet — be the first to contribute!</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -426,11 +553,28 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
           {/* REVIEWS TAB */}
           {activeTab === 'reviews' && (
             <div className="p-6 h-full">
+              {/* Average rating header */}
+              {reviewSummary && reviewSummary.count > 0 && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-200 flex items-center gap-4">
+                  <div className="text-center">
+                    <p className="text-3xl font-display text-amber-700">{reviewSummary.avg_rating?.toFixed(1)}</p>
+                    <div className="flex gap-0.5 mt-1">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <svg key={s} className={`w-4 h-4 ${s <= Math.round(reviewSummary.avg_rating ?? 0) ? 'text-amber-400' : 'text-stone-300'}`} fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                        </svg>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-amber-700">{reviewSummary.count} review{reviewSummary.count !== 1 ? 's' : ''}</p>
+                </div>
+              )}
+
               {/* Write a Review Section */}
               <div className="mb-8">
                 <h3 className="text-sm font-medium text-stone-900 mb-3 flex items-center gap-2">
                   <span className="text-lg">✍️</span>
-                  Write a Review
+                  {reviewSummary?.reviews.some(r => r.is_mine) ? 'Update Your Review' : 'Write a Review'}
                 </h3>
                 
                 {/* Star Rating */}
@@ -470,33 +614,53 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
                 </div>
 
                 <button
-                  onClick={() => {
-                    if (reviewText && reviewRating > 0) {
-                      alert(`Thank you for your ${reviewRating}-star review! (Backend not connected yet)`);
-                      setReviewText('');
-                      setReviewRating(0);
-                    } else {
-                      alert('Please add a rating and review text.');
-                    }
+                  disabled={reviewSubmitting}
+                  onClick={async () => {
+                    if (!reviewText || reviewRating <= 0) return;
+                    setReviewSubmitting(true);
+                    try {
+                      await submitReview(slug, reviewRating, reviewText);
+                      await loadReviews();
+                    } catch { /* ignore */ }
+                    setReviewSubmitting(false);
                   }}
-                  className="px-6 py-2.5 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
+                  className="px-6 py-2.5 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors disabled:opacity-50"
                 >
-                  Submit Review
+                  {reviewSubmitting ? 'Submitting...' : reviewSummary?.reviews.some(r => r.is_mine) ? 'Update Review' : 'Submit Review'}
                 </button>
               </div>
 
-              {/* Existing Reviews Placeholder */}
+              {/* Existing Reviews */}
               <div>
                 <h3 className="text-xs text-stone-400 uppercase tracking-wider mb-4">Community Reviews</h3>
-                <div className="h-48 bg-stone-50 rounded-xl border border-dashed border-stone-300 flex items-center justify-center">
-                  <div className="text-center">
-                    <svg className="w-12 h-12 text-stone-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-                    </svg>
-                    <p className="text-sm text-stone-400">No reviews yet</p>
-                    <p className="text-xs text-stone-400 mt-1">Be the first to review this project!</p>
+                {reviewsLoading ? (
+                  <p className="text-sm text-stone-400 text-center py-8">Loading...</p>
+                ) : reviewSummary && reviewSummary.reviews.length > 0 ? (
+                  <div className="space-y-4">
+                    {reviewSummary.reviews.map((r) => (
+                      <div key={r.id} className={`p-4 rounded-lg border ${r.is_mine ? 'border-teal-200 bg-teal-50' : 'border-stone-200 bg-stone-50'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <svg key={s} className={`w-4 h-4 ${s <= r.rating ? 'text-amber-400' : 'text-stone-300'}`} fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                              </svg>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {r.is_mine && <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">You</span>}
+                            <span className="text-xs text-stone-400">{new Date(r.created_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <p className="text-sm text-stone-700">{r.review_text}</p>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  <div className="h-32 bg-stone-50 rounded-xl border border-dashed border-stone-300 flex items-center justify-center">
+                    <p className="text-sm text-stone-400">No reviews yet — be the first to review!</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -548,40 +712,52 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
                 <p className="text-sm text-stone-500">Keep private notes about this property. Only visible to you.</p>
               </div>
 
-              <textarea
-                value={userNote}
-                onChange={(e) => setUserNote(e.target.value)}
-                placeholder="Write your notes here... 
+              {noteLoading ? (
+                <p className="text-sm text-stone-400 text-center py-8">Loading...</p>
+              ) : (
+                <>
+                  <textarea
+                    value={userNote}
+                    onChange={(e) => setUserNote(e.target.value)}
+                    placeholder="Write your notes here... 
 
 • What did you like about this project?
 • Questions to ask the builder
 • Pros and cons from site visit
 • Payment terms discussed
 • Contact person details"
-                rows={12}
-                className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-stone-900 resize-none"
-              />
+                    rows={12}
+                    className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-stone-900 resize-none"
+                  />
 
-              <div className="mt-4 flex items-center justify-between">
-                <p className="text-xs text-stone-400">
-                  <span className="inline-flex items-center gap-1">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    Private - only visible to you
-                  </span>
-                </p>
-                <button
-                  onClick={() => {
-                    if (userNote) {
-                      alert('Note saved! (Local storage coming soon)');
-                    }
-                  }}
-                  className="px-6 py-2.5 bg-stone-800 text-white rounded-lg font-medium hover:bg-stone-900 transition-colors"
-                >
-                  Save Note
-                </button>
-              </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <p className="text-xs text-stone-400">
+                      <span className="inline-flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                        Private — only visible to you
+                        {noteSavedAt && <span className="ml-2">· Last saved {new Date(noteSavedAt).toLocaleString()}</span>}
+                      </span>
+                    </p>
+                    <button
+                      disabled={noteSaving}
+                      onClick={async () => {
+                        if (!userNote.trim()) return;
+                        setNoteSaving(true);
+                        try {
+                          const saved = await saveNote(slug, userNote);
+                          setNoteSavedAt(saved.updated_at);
+                        } catch { /* ignore */ }
+                        setNoteSaving(false);
+                      }}
+                      className="px-6 py-2.5 bg-stone-800 text-white rounded-lg font-medium hover:bg-stone-900 transition-colors disabled:opacity-50"
+                    >
+                      {noteSaving ? 'Saving...' : 'Save Note'}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

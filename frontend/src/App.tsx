@@ -37,12 +37,13 @@ function App() {
     fetchProperties,
   } = usePropertyStore()
 
-  const { showOnlyFavorites, isFavorite } = useFavoritesStore()
+  const { showOnlyFavorites, isFavorite, loadFavorites } = useFavoritesStore()
 
   // Fetch properties from API on mount
   useEffect(() => {
     fetchProperties()
-  }, [fetchProperties])
+    loadFavorites()
+  }, [fetchProperties, loadFavorites])
 
   // Pagination state
   const [visibleCount, setVisibleCount] = useState(PROPERTIES_PER_PAGE)

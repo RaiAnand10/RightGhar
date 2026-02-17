@@ -49,7 +49,7 @@ export interface ProjectDetail extends ProjectListItem {
 }
 
 export async function fetchAllProjects(): Promise<ProjectListItem[]> {
-  const response = await fetch(`${API_BASE}/api/v1/projects`);
+  const response = await fetch(`${API_BASE}/api/v1/projects`, { credentials: 'include' });
   if (!response.ok) {
     throw new Error(`Failed to fetch projects: ${response.statusText}`);
   }
@@ -57,9 +57,126 @@ export async function fetchAllProjects(): Promise<ProjectListItem[]> {
 }
 
 export async function fetchProjectDetail(slug: string): Promise<ProjectDetail> {
-  const response = await fetch(`${API_BASE}/api/v1/projects/${slug}`);
+  const response = await fetch(`${API_BASE}/api/v1/projects/${slug}`, { credentials: 'include' });
   if (!response.ok) {
     throw new Error(`Failed to fetch project: ${response.statusText}`);
   }
   return response.json();
+}
+
+// --- Price Quotes ---
+
+export interface PriceQuoteOut {
+  id: number;
+  price_per_sqft: number;
+  configuration: string | null;
+  is_mine: boolean;
+  created_at: string;
+}
+
+export interface PriceQuoteSummary {
+  quotes: PriceQuoteOut[];
+  count: number;
+  avg_price: number | null;
+  min_price: number | null;
+  max_price: number | null;
+}
+
+export async function fetchQuotes(slug: string): Promise<PriceQuoteSummary> {
+  const res = await fetch(`${API_BASE}/api/v1/projects/${slug}/quotes`, { credentials: 'include' });
+  if (!res.ok) throw new Error('Failed to fetch quotes');
+  return res.json();
+}
+
+export async function submitQuote(slug: string, price_per_sqft: number, configuration?: string): Promise<PriceQuoteOut> {
+  const res = await fetch(`${API_BASE}/api/v1/projects/${slug}/quotes`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ price_per_sqft, configuration: configuration || null }),
+  });
+  if (!res.ok) throw new Error('Failed to submit quote');
+  return res.json();
+}
+
+// --- Reviews ---
+
+export interface ReviewOut {
+  id: number;
+  rating: number;
+  review_text: string;
+  is_mine: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReviewSummary {
+  reviews: ReviewOut[];
+  count: number;
+  avg_rating: number | null;
+}
+
+export async function fetchReviews(slug: string): Promise<ReviewSummary> {
+  const res = await fetch(`${API_BASE}/api/v1/projects/${slug}/reviews`, { credentials: 'include' });
+  if (!res.ok) throw new Error('Failed to fetch reviews');
+  return res.json();
+}
+
+export async function submitReview(slug: string, rating: number, review_text: string): Promise<ReviewOut> {
+  const res = await fetch(`${API_BASE}/api/v1/projects/${slug}/reviews`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rating, review_text }),
+  });
+  if (!res.ok) throw new Error('Failed to submit review');
+  return res.json();
+}
+
+// --- Notes ---
+
+export interface NoteOut {
+  note_text: string;
+  updated_at: string;
+  project_slug: string | null;
+}
+
+export async function fetchNote(slug: string): Promise<NoteOut | null> {
+  const res = await fetch(`${API_BASE}/api/v1/me/notes/${slug}`, { credentials: 'include' });
+  if (!res.ok) throw new Error('Failed to fetch note');
+  const data = await res.json();
+  return data; // null if no note exists
+}
+
+export async function saveNote(slug: string, note_text: string): Promise<NoteOut> {
+  const res = await fetch(`${API_BASE}/api/v1/me/notes/${slug}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ note_text }),
+  });
+  if (!res.ok) throw new Error('Failed to save note');
+  return res.json();
+}
+
+// --- Favorites ---
+
+export async function fetchFavorites(): Promise<string[]> {
+  const res = await fetch(`${API_BASE}/api/v1/me/favorites`, { credentials: 'include' });
+  if (!res.ok) throw new Error('Failed to fetch favorites');
+  return res.json();
+}
+
+export async function addFavorite(slug: string): Promise<void> {
+  await fetch(`${API_BASE}/api/v1/me/favorites/${slug}`, {
+    method: 'PUT',
+    credentials: 'include',
+  });
+}
+
+export async function removeFavorite(slug: string): Promise<void> {
+  await fetch(`${API_BASE}/api/v1/me/favorites/${slug}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
 }
