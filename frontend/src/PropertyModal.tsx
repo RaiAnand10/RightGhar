@@ -8,6 +8,9 @@ import {
   fetchReviews, submitReview, ReviewSummary,
   fetchNote, saveNote,
 } from './api';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts';
 
 interface PropertyModalProps {
   property: Property | null;
@@ -25,7 +28,8 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
 
   // Price quote state
   const [priceQuote, setPriceQuote] = useState('');
-  const [quoteConfig, setQuoteConfig] = useState('');
+  const [quoteConfig, setQuoteConfig] = useState('3 BHK');
+  const [quotedDate, setQuotedDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [quoteSummary, setQuoteSummary] = useState<PriceQuoteSummary | null>(null);
   const [quotesLoading, setQuotesLoading] = useState(false);
   const [quoteSubmitting, setQuoteSubmitting] = useState(false);
@@ -441,31 +445,7 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
           {/* PRICES TAB */}
           {activeTab === 'prices' && (
             <div className="p-6 h-full">
-              {/* Current Listed Price */}
-              <div className="mb-6 p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-200">
-                <p className="text-xs text-teal-600 uppercase tracking-wider mb-1">Listed Price Range</p>
-                <p className="text-2xl font-display text-teal-800">{metadata.price || 'Price On Request'}</p>
-              </div>
-
-              {/* Community Price Aggregates */}
-              {quoteSummary && quoteSummary.count > 0 && (
-                <div className="mb-6 grid grid-cols-3 gap-3">
-                  <div className="bg-stone-50 rounded-xl p-4 text-center">
-                    <p className="text-xl font-display text-stone-900">₹{quoteSummary.avg_price?.toLocaleString()}</p>
-                    <p className="text-xs text-stone-500 uppercase tracking-wider">Avg /sqft</p>
-                  </div>
-                  <div className="bg-stone-50 rounded-xl p-4 text-center">
-                    <p className="text-xl font-display text-stone-900">₹{quoteSummary.min_price?.toLocaleString()}</p>
-                    <p className="text-xs text-stone-500 uppercase tracking-wider">Min /sqft</p>
-                  </div>
-                  <div className="bg-stone-50 rounded-xl p-4 text-center">
-                    <p className="text-xl font-display text-stone-900">₹{quoteSummary.max_price?.toLocaleString()}</p>
-                    <p className="text-xs text-stone-500 uppercase tracking-wider">Max /sqft</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Add Your Quote Section */}
+              {/* Share Your Quote Form */}
               <div className="mb-8">
                 <h3 className="text-sm font-medium text-stone-900 mb-3 flex items-center gap-2">
                   <span className="text-lg">💰</span>
@@ -474,7 +454,7 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
                 <p className="text-sm text-stone-500 mb-4">Help others by sharing the price you were quoted by the builder.</p>
                 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="block text-xs text-stone-500 uppercase tracking-wider mb-2">Price per Sq.Ft (₹) *</label>
                       <input
@@ -486,26 +466,40 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-stone-500 uppercase tracking-wider mb-2">Configuration (optional)</label>
-                      <input
-                        type="text"
+                      <label className="block text-xs text-stone-500 uppercase tracking-wider mb-2">Configuration *</label>
+                      <select
                         value={quoteConfig}
                         onChange={(e) => setQuoteConfig(e.target.value)}
-                        placeholder="e.g., 3 BHK"
+                        className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-stone-900 bg-white"
+                      >
+                        <option value="1 BHK">1 BHK</option>
+                        <option value="2 BHK">2 BHK</option>
+                        <option value="3 BHK">3 BHK</option>
+                        <option value="4 BHK">4 BHK</option>
+                        <option value="5 BHK">5 BHK</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-stone-500 uppercase tracking-wider mb-2">Date Quoted *</label>
+                      <input
+                        type="date"
+                        value={quotedDate}
+                        onChange={(e) => setQuotedDate(e.target.value)}
+                        max={new Date().toISOString().split('T')[0]}
                         className="w-full px-4 py-3 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-stone-900"
                       />
                     </div>
                   </div>
                   <button
-                    disabled={quoteSubmitting}
+                    disabled={quoteSubmitting || !priceQuote}
                     onClick={async () => {
                       const price = parseInt(priceQuote, 10);
                       if (!price || price <= 0) return;
                       setQuoteSubmitting(true);
                       try {
-                        await submitQuote(slug, price, quoteConfig || undefined);
+                        await submitQuote(slug, price, quoteConfig, quotedDate);
                         setPriceQuote('');
-                        setQuoteConfig('');
+                        setQuotedDate(new Date().toISOString().split('T')[0]);
                         await loadQuotes();
                       } catch { /* ignore */ }
                       setQuoteSubmitting(false);
@@ -517,29 +511,62 @@ function PropertyModal({ property, isOpen, onClose, initialTab = 'overview' }: P
                 </div>
               </div>
 
-              {/* Existing Quotes */}
+              {/* Price Over Time Chart */}
               <div>
                 <h3 className="text-xs text-stone-400 uppercase tracking-wider mb-4">
-                  Community Quotes {quoteSummary ? `(${quoteSummary.count})` : ''}
+                  Price Trends Over Time {quoteSummary ? `(${quoteSummary.count} quotes)` : ''}
                 </h3>
                 {quotesLoading ? (
                   <p className="text-sm text-stone-400 text-center py-8">Loading...</p>
                 ) : quoteSummary && quoteSummary.quotes.length > 0 ? (
-                  <div className="space-y-3">
-                    {quoteSummary.quotes.map((q) => (
-                      <div key={q.id} className={`p-3 rounded-lg border ${q.is_mine ? 'border-teal-200 bg-teal-50' : 'border-stone-200 bg-stone-50'}`}>
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span className="text-lg font-semibold text-stone-900">₹{q.price_per_sqft.toLocaleString()}/sqft</span>
-                            {q.configuration && <span className="ml-2 text-sm text-stone-500">({q.configuration})</span>}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {q.is_mine && <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">You</span>}
-                            <span className="text-xs text-stone-400">{new Date(q.created_at).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="bg-stone-50 rounded-xl border border-stone-200 p-4">
+                    <ResponsiveContainer width="100%" height={320}>
+                      <LineChart
+                        data={quoteSummary.quotes.map((q) => ({
+                          date: q.quoted_date,
+                          price: q.price_per_sqft,
+                          config: q.configuration,
+                          isMine: q.is_mine,
+                        }))}
+                        margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                        <XAxis
+                          dataKey="date"
+                          tick={{ fontSize: 12, fill: '#78716c' }}
+                          tickFormatter={(v: string) => {
+                            const d = new Date(v + 'T00:00:00');
+                            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                          }}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 12, fill: '#78716c' }}
+                          tickFormatter={(v: number) => `₹${v.toLocaleString('en-IN')}`}
+                          width={80}
+                        />
+                        <Tooltip
+                          formatter={(value: number, _name: string, props: { payload: { config: string; isMine: boolean } }) => [
+                            `₹${value.toLocaleString('en-IN')}/sqft — ${props.payload.config}${props.payload.isMine ? ' (You)' : ''}`,
+                            'Price',
+                          ]}
+                          labelFormatter={(label: string) => {
+                            const d = new Date(label + 'T00:00:00');
+                            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+                          }}
+                          contentStyle={{ borderRadius: '8px', border: '1px solid #e7e5e4', fontSize: '13px' }}
+                        />
+                        <Legend />
+                        <Line
+                          type="monotone"
+                          dataKey="price"
+                          stroke="#14b8a6"
+                          strokeWidth={2}
+                          dot={{ r: 5, fill: '#14b8a6', stroke: '#fff', strokeWidth: 2 }}
+                          activeDot={{ r: 7 }}
+                          name="₹/sqft"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
                   </div>
                 ) : (
                   <div className="h-32 bg-stone-50 rounded-xl border border-dashed border-stone-300 flex items-center justify-center">

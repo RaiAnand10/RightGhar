@@ -1,18 +1,25 @@
-from datetime import datetime
+from datetime import date, datetime
+from enum import Enum
+from typing import Literal
 from pydantic import BaseModel, Field
 
 
 # --- Price Quotes ---
 
+BHK_OPTIONS = Literal["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK"]
+
+
 class PriceQuoteCreate(BaseModel):
     price_per_sqft: int = Field(gt=0, description="Price in ₹ per sq.ft")
-    configuration: str | None = Field(None, max_length=100, description="e.g. '3 BHK'")
+    configuration: BHK_OPTIONS = Field(description="e.g. '3 BHK'")
+    quoted_date: date | None = Field(None, description="Date the price was quoted; defaults to today")
 
 
 class PriceQuoteOut(BaseModel):
     id: int
     price_per_sqft: int
-    configuration: str | None = None
+    configuration: str
+    quoted_date: date
     is_mine: bool = False
     created_at: datetime
 
@@ -23,9 +30,6 @@ class PriceQuoteOut(BaseModel):
 class PriceQuoteSummary(BaseModel):
     quotes: list[PriceQuoteOut]
     count: int
-    avg_price: float | None = None
-    min_price: int | None = None
-    max_price: int | None = None
 
 
 # --- Reviews ---

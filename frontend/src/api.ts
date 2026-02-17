@@ -69,7 +69,8 @@ export async function fetchProjectDetail(slug: string): Promise<ProjectDetail> {
 export interface PriceQuoteOut {
   id: number;
   price_per_sqft: number;
-  configuration: string | null;
+  configuration: string;
+  quoted_date: string;
   is_mine: boolean;
   created_at: string;
 }
@@ -77,9 +78,6 @@ export interface PriceQuoteOut {
 export interface PriceQuoteSummary {
   quotes: PriceQuoteOut[];
   count: number;
-  avg_price: number | null;
-  min_price: number | null;
-  max_price: number | null;
 }
 
 export async function fetchQuotes(slug: string): Promise<PriceQuoteSummary> {
@@ -88,12 +86,17 @@ export async function fetchQuotes(slug: string): Promise<PriceQuoteSummary> {
   return res.json();
 }
 
-export async function submitQuote(slug: string, price_per_sqft: number, configuration?: string): Promise<PriceQuoteOut> {
+export async function submitQuote(
+  slug: string,
+  price_per_sqft: number,
+  configuration: string,
+  quoted_date: string,
+): Promise<PriceQuoteOut> {
   const res = await fetch(`${API_BASE}/api/v1/projects/${slug}/quotes`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ price_per_sqft, configuration: configuration || null }),
+    body: JSON.stringify({ price_per_sqft, configuration, quoted_date }),
   });
   if (!res.ok) throw new Error('Failed to submit quote');
   return res.json();

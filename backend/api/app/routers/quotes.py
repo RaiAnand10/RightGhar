@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func as sql_func
@@ -24,6 +26,7 @@ async def submit_quote(
         user_cookie=user_cookie,
         price_per_sqft=body.price_per_sqft,
         configuration=body.configuration,
+        quoted_date=body.quoted_date or date.today(),
     )
     db.add(quote)
     await db.commit()
@@ -32,6 +35,7 @@ async def submit_quote(
         id=quote.id,
         price_per_sqft=quote.price_per_sqft,
         configuration=quote.configuration,
+        quoted_date=quote.quoted_date,
         is_mine=True,
         created_at=quote.created_at,
     )
@@ -48,7 +52,7 @@ async def get_quotes(
     result = await db.execute(
         select(PriceQuote)
         .where(PriceQuote.project_id == project.id)
-        .order_by(PriceQuote.created_at.desc())
+        .order_by(PriceQuote.quoted_date.asc())
     )
     quotes = result.scalars().all()
 
@@ -57,19 +61,16 @@ async def get_quotes(
             id=q.id,
             price_per_sqft=q.price_per_sqft,
             configuration=q.configuration,
+            quoted_date=q.quoted_date,
             is_mine=(q.user_cookie == user_cookie),
             created_at=q.created_at,
         )
         for q in quotes
     ]
 
-    prices = [q.price_per_sqft for q in quotes]
     return PriceQuoteSummary(
         quotes=quote_list,
         count=len(quotes),
-        avg_price=round(sum(prices) / len(prices), 0) if prices else None,
-        min_price=min(prices) if prices else None,
-        max_price=max(prices) if prices else None,
     )
 
 
